@@ -135,7 +135,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
 .hero-slide{
   position:absolute;top:0;left:0;right:0;bottom:0;
   width:100%;height:100%;
-  background-size:cover;background-position:center top;
+  background-size:cover;background-position:center center;
   opacity:0;z-index:0;
   transition:opacity 0.6s ease-in-out;
 }
@@ -795,7 +795,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
     <div class="promo-strip">
       <div class="ps-item">
         <span>🚚 Free Delivery</span>
-        <span class="ps-sub">Orders over K500</span>
+        <span class="ps-sub">Always free, always!</span>
       </div>
       <div class="ps-item">
         <span>💳 No Hidden Fees</span>
@@ -844,10 +844,10 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
     <!-- Super Deals -->
     <div class="flash-hd">
       <div class="flash-title">⚡ <span>Super</span> Deals</div>
-      <div class="flash-link" onclick="go('sale')">See All →</div>
+      <div class="flash-link" onclick="go('shop')">See All →</div>
     </div>
     <div class="flash-grid" id="home-grid">
-      <div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);font-weight:600">Loading...</div>
+      <div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);font-weight:600" id="home-loading">Loading...</div>
     </div>
 
     <!-- Sale Banner -->
@@ -857,7 +857,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
         <p>Limited time offers on top styles</p>
         <button class="btn-primary" onclick="go('sale')" style="margin-top:12px;font-size:12px;padding:9px 16px">Shop Sale →</button>
       </div>
-      <div class="sb-disc">50%<br>OFF</div>
+      <div class="sb-disc">BIG<br>SALE</div>
     </div>
   </div>
 
@@ -988,7 +988,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
         <h3>📦 Track Delivery</h3>
         <p>Enter your order number to check your delivery status</p>
         <div class="track-input-row">
-          <input class="track-input" id="track-input" placeholder="e.g. SA-1234" oninput="this.value=this.value.toUpperCase()">
+          <input class="track-input" id="track-input" placeholder="e.g. BI-A1B2" oninput="this.value=this.value.toUpperCase()">
           <button class="track-btn" onclick="trackOrder()">Track</button>
         </div>
       </div>
@@ -1312,7 +1312,8 @@ onSnapshot(collection(db, COLL), snap => {
   PRODUCTS = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
   const ids = new Set(PRODUCTS.map(p=>p._id));
   const cartBefore = cart.length;
-  cart = cart.filter(c=>ids.has(c._id));
+  // Keep regular items whose product exists, AND bundle items whose base product exists
+  cart = cart.filter(c => ids.has(c._id) || (c.bundleActive && ids.has(c._id.replace('_bundle',''))));
   wishlist = wishlist.filter(w=>ids.has(w));
   if(cart.length !== cartBefore){ saveCart(); updateCartUI(); }
   localStorage.setItem('bi_wishlist', JSON.stringify(wishlist));
@@ -1339,7 +1340,7 @@ onSnapshot(collection(db, ORDERS_COLL), async snap => {
 
 /* ════ CARD RENDER (SHEIN flash-item style) ════ */
 function card(p) {
-  const inCart = cart.some(c=>c._id===p._id);
+  const inCart = cart.some(c=>c._id===p._id || c._id===p._id+'_bundle');
   const inWish = wishlist.includes(p._id);
   const cat = getCat(p);
   const thumb = p.image
@@ -1379,7 +1380,7 @@ function render(gridId, items) {
 function loadSec(sec) {
   const all = PRODUCTS;
   switch(sec) {
-    case 'home':     render('home-grid',  all.filter(p=>p.featured)); break;
+    case 'home':     render('home-grid',  all.filter(p=>p.featured).slice(0,10)); break;
     case 'shop':     doFilter();           break;
     case 'women':    render('women-grid', all.filter(p=>getCat(p)==='women')); break;
     case 'men':      render('men-grid',   all.filter(p=>getCat(p)==='men')); break;
@@ -1432,7 +1433,12 @@ window.doFilter = function(){
   let items = [...PRODUCTS];
   if(cat)   items = items.filter(p=>getCat(p)===cat);
   if(badge) items = items.filter(p=>p.badge===badge);
-  if(q)     items = items.filter(p=>(p.name||'').toLowerCase().includes(q)||(getCat(p)).toLowerCase().includes(q));
+  if(q)     items = items.filter(p=>
+    (p.name||'').toLowerCase().includes(q) ||
+    (getCat(p)).toLowerCase().includes(q)  ||
+    (p.desc||'').toLowerCase().includes(q) ||
+    (p.badge||'').toLowerCase().includes(q)
+  );
   items = sortItems(items);
   render('shop-grid', items);
   const lbl = document.getElementById('shop-results-lbl');
@@ -1459,8 +1465,8 @@ window.addCart = function(e, id){
   if(e) e.stopPropagation();
   const p = PRODUCTS.find(x=>x._id===id);
   if(!p) return;
-  if(!cart.some(c=>c._id===id)){
-    cart.push({...p, qty:1});
+  if(!cart.some(c=>c._id===id || c._id===id+'_bundle')){
+    cart.push({...p, qty:1, bundleActive:false});
     saveCart(); toast('🛒 Added to cart!');
   } else { toast('✓ Already in cart'); }
   updateCartUI(); loadSec(currentSec);
@@ -1483,13 +1489,11 @@ function saveCart(){ localStorage.setItem('bi_cart', JSON.stringify(cart)); }
 function updateCartUI(){
   const total = cart.reduce((s,c)=>s+(c.qty||1),0);
   const numEl = document.getElementById('h-cart-num');
-  numEl.textContent = total;
-  numEl.classList.toggle('hidden', total===0);
+  if(numEl){ numEl.textContent = total; numEl.classList.toggle('hidden', total===0); }
   const dot = document.getElementById('cart-dot');
   if(dot) dot.style.display = total>0 ? 'block' : 'none';
   const badge = document.getElementById('wish-badge');
-  badge.textContent = wishlist.length;
-  badge.classList.toggle('hidden', wishlist.length===0);
+  if(badge){ badge.textContent = wishlist.length; badge.classList.toggle('hidden', wishlist.length===0); }
 }
 
 window.openCart = function(){
@@ -1524,12 +1528,12 @@ function renderCart(){
       <div class="ci-info">
         <div class="ci-name">${item.name}</div>
         <div class="ci-meta">${item.bundleActive
-          ? `K${item.bundlePrice} per bundle`
+          ? `K${item.bundlePrice} per bundle · ${item.bundleQty} items each`
           : `K${item.price} each`}</div>
-        ${item.bundleActive?`<div class="ci-bundle-tag">🔥 ${item.bundleQty} items per bundle</div>`:''}
+        ${item.bundleActive?`<div class="ci-bundle-tag">🔥 Total: ${item.bundleQty*(item.qty||1)} items</div>`:''}
         <div class="qty-row">
           <button class="qbtn" onclick="changeQty('${item._id}',-1)">−</button>
-          <span class="qval">${item.qty||1}</span>
+          <span class="qval">${item.qty||1} ${item.bundleActive?'bundle'+(( item.qty||1)>1?'s':''):''}</span>
           <button class="qbtn" onclick="changeQty('${item._id}',1)">+</button>
         </div>
       </div>
@@ -1539,7 +1543,7 @@ function renderCart(){
       </div>
     </div>`).join('');
   const subtotal = cartSubtotal();
-  const delivery = subtotal >= 500 ? 0 : 50;
+  const delivery = 0;
   foot.innerHTML = `
     <div class="cart-row"><span>Subtotal</span><span>K${subtotal.toFixed(0)}</span></div>
     <div class="cart-row"><span>Delivery</span><span>${delivery===0?'<span style="color:var(--green)">FREE</span>':'K'+delivery}</span></div>
@@ -1554,7 +1558,7 @@ window.startCheckout = function(){
 
 function showCheckoutForm(){
   const subtotal = cartSubtotal();
-  const delivery = subtotal >= 500 ? 0 : 50;
+  const delivery = 0;
   const total = subtotal + delivery;
   document.getElementById('pm-content').innerHTML = `
     <div style="padding:20px">
@@ -1574,7 +1578,7 @@ function showCheckoutForm(){
       <div class="af-grp"><label>Delivery Address *</label><input id="co-address" placeholder="House/Plot number, Street"></div>
       <div class="af-row">
         <div class="af-grp"><label>Area/Compound</label><input id="co-area" placeholder="e.g. Chilenje"></div>
-        <div class="af-grp"><label>Town *</label><input id="co-town" placeholder="Lusaka"></div>
+        <div class="af-grp"><label>Town *</label><input id="co-town" placeholder="e.g. Lusaka"></div>
       </div>
       <div class="af-grp"><label>Payment Method *</label>
         <select id="co-payment" style="border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);background:var(--bg);outline:none;width:100%">
@@ -1586,7 +1590,13 @@ function showCheckoutForm(){
       <div class="af-grp"><label>Order Notes</label><textarea id="co-notes" placeholder="Any special instructions..."></textarea></div>
       <div style="background:var(--bg2);border-radius:var(--r-sm);padding:12px;margin-bottom:14px;border:1px solid var(--border)">
         <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px">Order Summary</div>
-        ${cart.map(c=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)"><span>${c.name} ×${c.qty||1}</span><span style="font-weight:700">K${((c.qty||1)*c.price).toFixed(0)}</span></div>`).join('')}
+        ${cart.map(c=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)">
+          <span>${c.bundleActive
+            ? `🔥 ${c.name} ×${c.bundleQty*(c.qty||1)} items (${c.qty||1} bundle${(c.qty||1)>1?'s':''})`
+            : c.name+' ×'+(c.qty||1)
+          }</span>
+          <span style="font-weight:700">K${itemLineTotal(c).toFixed(0)}</span>
+        </div>`).join('')}
         <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;margin-top:10px">
           <span>Total</span><span style="color:var(--red)">K${total.toFixed(0)}</span>
         </div>
@@ -1600,18 +1610,18 @@ let _submittingOrder = false;
 window.submitOrder = async function(){
   if(_submittingOrder) return;
   _submittingOrder = true;
-  const btn = document.querySelector('.af-submit');
+  const btn = document.getElementById('modal-wrap')?.querySelector('.af-submit');
   if(btn){ btn.disabled=true; btn.textContent='Placing order...'; }
   const name    = document.getElementById('co-name')?.value.trim();
   const phone   = document.getElementById('co-phone')?.value.trim();
   const address = document.getElementById('co-address')?.value.trim();
   const area    = document.getElementById('co-area')?.value.trim();
-  const town    = document.getElementById('co-town')?.value.trim() || 'Lusaka';
+  const town    = document.getElementById('co-town')?.value.trim();
   const notes   = document.getElementById('co-notes')?.value.trim();
   const payment = document.getElementById('co-payment')?.value || 'Cash on Delivery';
   const branchKey = document.querySelector('input[name="co-branch"]:checked')?.value || 'lusaka';
-  const branch = BRANCHES[branchKey];
-  if(!name||!phone||!address){
+  const branch = BRANCHES[branchKey] || BRANCHES.lusaka;
+  if(!name||!phone||!address||!town){
     toast('⚠️ Please fill all required fields');
     if(btn){ btn.disabled=false; btn.textContent='✅ Place Order via WhatsApp'; }
     _submittingOrder=false; return;
@@ -1624,7 +1634,7 @@ window.submitOrder = async function(){
   }
   const orderNum = 'BI-' + Date.now().toString(36).toUpperCase().slice(-4) + Math.floor(100+Math.random()*900);
   const subtotal = cartSubtotal();
-  const delivery = subtotal>=500?0:50;
+  const delivery = 0;
   try {
     await addDoc(collection(db, ORDERS_COLL), {
       orderNum, customerName:name, phone, address, area, town, notes, payment,
@@ -1647,7 +1657,10 @@ window.submitOrder = async function(){
     : `• ${c.name} ×${c.qty||1} = K${itemLineTotal(c).toFixed(0)}`
   ).join('\n');
   const msg = `🛍️ *Shade's Apparel — New Order*\n\n*Branch:* ${branch.label}\n*Order #:* ${orderNum}\n*Name:* ${name}\n*Phone:* ${phone}\n*Address:* ${address}${area?', '+area:''}, ${town}\n\n*Items:*\n${itemsText}\n\n*Subtotal:* K${subtotal.toFixed(0)}\n*Delivery:* ${delivery===0?'FREE':'K'+delivery}\n*Payment:* ${payment}\n*TOTAL:* K${(subtotal+delivery).toFixed(0)}\n\n${notes?'*Notes:* '+notes+'\n\n':''}Thank you for shopping with Shade's Apparel! 🛍️`;
-  window.open(`https://wa.me/${branch.wa}?text=${encodeURIComponent(msg)}`,'_blank');
+  const waUrl = `https://wa.me/${branch.wa}?text=${encodeURIComponent(msg)}`;
+  const waLink = document.createElement('a');
+  waLink.href = waUrl; waLink.target = '_blank'; waLink.rel = 'noopener noreferrer';
+  document.body.appendChild(waLink); waLink.click(); document.body.removeChild(waLink);
   cart=[]; saveCart(); updateCartUI();
   _submittingOrder=false;
   document.getElementById('pm-content').innerHTML = `
@@ -1677,7 +1690,7 @@ window.submitOrder = async function(){
 window.openModal = function(id){
   const p = PRODUCTS.find(x=>x._id===id);
   if(!p) return;
-  const inCart = cart.some(c=>c._id===id);
+  const inCart = cart.some(c=>c._id===id || c._id===id+'_bundle');
   const inWish = wishlist.includes(id);
   const sizes = (p.sizes||'').split(',').map(s=>s.trim()).filter(Boolean);
   const cat = getCat(p);
@@ -1735,7 +1748,7 @@ window.selBundle = function(type, id){
   document.getElementById('bopt-bundle')?.classList.toggle('active', type==='bundle');
   const p = PRODUCTS.find(x=>x._id===id);
   if(!p) return;
-  const priceEl = document.querySelector('.pm-price');
+  const priceEl = document.getElementById('pm-content')?.querySelector('.pm-price');
   if(priceEl){
     priceEl.textContent = type==='bundle' ? `K${p.bundlePrice}` : `K${p.price}`;
   }
@@ -1840,7 +1853,7 @@ function renderTrackResult(order){
   document.getElementById('track-result').innerHTML = `
     <div class="track-result">
       <div class="tr-num">Order #${order.orderNum}</div>
-      <div class="tr-name">${order.customerName||order.name}</div>
+      <div class="tr-name">${order.customerName||'Customer'}</div>
       <div class="status-steps">
         ${steps.map((s,i)=>`
           <div class="ss-step ${i<cur?'done':i===cur?'active':''}">
@@ -1958,7 +1971,7 @@ function renderAdmList(){
       <div class="ap-info">
         <div class="ap-name">${p.name}</div>
         <div class="ap-meta">${getCat(p)} ${p.badge?'· '+p.badge:''} ${p.featured?'· ⭐':''}</div>
-        <div class="ap-price">K${p.price}</div>
+        <div class="ap-price">K${p.price}${p.bundleQty&&p.bundlePrice?` <span style="color:#ff6b00;font-size:10px;font-weight:700">· 🔥${p.bundleQty} for K${p.bundlePrice}</span>`:''}</div>
       </div>
       <div class="ap-actions">
         <button class="ap-btn edit" onclick="openEditPanel('${p._id}')">✏️</button>
@@ -2023,7 +2036,8 @@ window.admAddProduct = async function(){
       createdAt:  serverTimestamp()
     });
     toast('✅ Product added!');
-    ['ap-name','ap-price','ap-old','ap-icon','ap-sizes','ap-desc','ap-bundle-qty','ap-bundle-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['ap-name','ap-price','ap-old','ap-icon','ap-sizes','ap-desc','ap-bundle-qty','ap-bundle-price','ap-badge'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    document.getElementById('ap-category').value='women';
     document.getElementById('ap-featured').checked=false;
     document.getElementById('ap-img-preview').style.display='none';
     document.getElementById('ap-img-label').style.display='block';
@@ -2186,7 +2200,7 @@ window.notifyCustomer = function(orderId){
   const msgFn = WA_MESSAGES[status]||WA_MESSAGES.pending;
   const msg = encodeURIComponent(msgFn(name, orderNum));
   const cleaned = phone.replace(/\D/g,'');
-  const wa = cleaned.startsWith('0')?'260'+cleaned.slice(1):cleaned;
+  const wa = cleaned.startsWith('260') ? cleaned : cleaned.startsWith('0') ? '260'+cleaned.slice(1) : '260'+cleaned;
   window.open(`https://wa.me/${wa}?text=${msg}`,'_blank');
 };
 
@@ -2281,6 +2295,12 @@ window.setBranch = function(key){
 /* ── INIT ── */
 updateCartUI();
 go('home');
+
+/* Loading timeout — if products don't load in 8s show fallback */
+setTimeout(()=>{
+  const el = document.getElementById('home-loading');
+  if(el) el.innerHTML = `<div style="font-size:32px;margin-bottom:8px">😔</div><p>No products yet — check back soon!</p>`;
+}, 8000);
 
 /* ════ HERO SLIDESHOW ════ */
 (function(){
