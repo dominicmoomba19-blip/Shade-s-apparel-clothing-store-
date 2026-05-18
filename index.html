@@ -129,12 +129,29 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
 /* ─── HERO BANNER ─── */
 .hero-banner{
   position:relative;overflow:hidden;
-  background:linear-gradient(160deg,#1a0a0c 0%,#2d0d14 50%,#1a0a0c 100%);
-  min-height:180px;display:flex;align-items:flex-end;
+  background:#1a0a0c;
+  min-height:300px;display:flex;align-items:flex-end;
 }
-.hero-banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55}
+.hero-slide{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  width:100%;height:100%;
+  background-size:cover;background-position:center top;
+  opacity:0;z-index:0;
+  transition:opacity 0.6s ease-in-out;
+}
+.hero-slide.active{opacity:.7;}
+.hero-dots{
+  position:absolute;bottom:10px;right:14px;
+  display:flex;gap:5px;z-index:10;
+}
+.hero-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.4);
+  transition:background .3s;cursor:pointer;
+}
+.hero-dot.active{background:#fff;}
 .hero-content{
-  position:relative;z-index:1;padding:24px 18px;width:100%;
+  position:relative;z-index:10;padding:24px 18px;width:100%;
   background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 100%);
 }
 .hero-eyebrow{
@@ -745,8 +762,13 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
   <!-- ═══ HOME ═══ -->
   <div class="section active" id="sec-home">
     <!-- Hero Banner -->
-    <div class="hero-banner">
-      <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=900&q=80&fit=crop&auto=format" alt="Fashion" loading="lazy" onerror="this.style.display='none'">
+    <div class="hero-banner" id="heroBanner">
+      <div class="hero-slide active" style="background-image:url('https://res.cloudinary.com/dxxiujvrw/image/upload/v1779069526/1779068458081_szq8nk.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://res.cloudinary.com/dxxiujvrw/image/upload/v1779069526/1779068482960_ozmbru.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://res.cloudinary.com/dxxiujvrw/image/upload/v1779069528/Screenshot_20260518_034235_xaqls6.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://res.cloudinary.com/dxxiujvrw/image/upload/v1779069531/1779068605743_vqrhvd.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://res.cloudinary.com/dxxiujvrw/image/upload/v1779069532/1779068530454_dudtjk.jpg')"></div>
+      <div class="hero-dots" id="heroDots"></div>
       <div class="hero-content">
         <div class="hero-eyebrow">✨ New Collection</div>
         <h1>DRESS<br>TO <span>IMPRESS</span></h1>
@@ -2173,6 +2195,49 @@ window.setBranch = function(key){
 /* ── INIT ── */
 updateCartUI();
 go('home');
-</script>
+
+/* ════ HERO SLIDESHOW ════ */
+(function(){
+  const slides = document.querySelectorAll('.hero-slide');
+  const dotsWrap = document.getElementById('heroDots');
+  let cur = 0, timer;
+
+  // Set initial z-indexes
+  slides.forEach((s,i)=>{ s.style.zIndex = i===0 ? '1' : '0'; });
+
+  // Build dots
+  slides.forEach((_,i)=>{
+    const d = document.createElement('div');
+    d.className = 'hero-dot' + (i===0?' active':'');
+    d.onclick = ()=>{ goSlide(i); resetTimer(); };
+    dotsWrap.appendChild(d);
+  });
+
+  function goSlide(n){
+    if(n === cur) return;
+    const prev = cur;
+    cur = (n + slides.length) % slides.length;
+
+    // New slide comes on top and fades in
+    slides[cur].style.zIndex = '2';
+    slides[cur].classList.add('active');
+    dotsWrap.children[prev].classList.remove('active');
+    dotsWrap.children[cur].classList.add('active');
+
+    // After fade completes, clean up z-indexes
+    setTimeout(()=>{
+      slides[prev].classList.remove('active');
+      slides[prev].style.zIndex = '0';
+      slides[cur].style.zIndex = '1';
+    }, 650);
+  }
+
+  function resetTimer(){
+    clearInterval(timer);
+    timer = setInterval(()=>goSlide(cur+1), 4500);
+  }
+
+  resetTimer();
+})();</script>
 </body>
 </html>
