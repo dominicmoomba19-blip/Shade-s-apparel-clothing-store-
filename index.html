@@ -914,6 +914,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
       <div class="hero-slide" style="background-image:url('https://res.cloudinary.com/dxxiujvrw/image/upload/v1779069532/1779068530454_dudtjk.jpg')"></div>
       <div class="hero-slide" style="background-image:url('https://res.cloudinary.com/dxxiujvrw/image/upload/v1779098113/1779097741016_witkbp.jpg')"></div>
       <div class="hero-slide" style="background-image:url('https://res.cloudinary.com/dxxiujvrw/image/upload/v1779098112/1779097768078_wloqra.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://res.cloudinary.com/dxxiujvrw/image/upload/v1779227897/1779227679849_psibtp.jpg')"></div>
       <div class="hero-dots" id="heroDots"></div>
       <div class="hero-content">
         <div class="hero-eyebrow">✨ New Collection</div>
@@ -1368,6 +1369,59 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
       <!-- SETTINGS TAB -->
       <div id="tab-settings" style="display:none">
         <div class="adm-form">
+
+          <!-- ── MAINTENANCE ── -->
+          <div class="cp-section" style="margin-bottom:14px">
+            <div class="cp-section-title">🧹 Auto Cleanup</div>
+            <p class="cp-hint">Run these when the app feels sluggish or you're doing a routine tidy-up. Each action previews what will be affected before committing.</p>
+
+            <!-- Archive delivered -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--ink)">📦 Archive Delivered Orders</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">Move all <em>delivered</em> orders to archive</div>
+              </div>
+              <button class="af-submit" style="margin:0;padding:9px 14px;font-size:12px;min-width:80px" onclick="cleanupArchiveDelivered()">Run</button>
+            </div>
+
+            <!-- Purge old archived -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);gap:10px">
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:700;color:var(--ink)">🗑️ Purge Old Archives</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">Permanently delete archived orders older than:</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+                  <select id="purge-days" style="padding:5px 8px;border-radius:6px;border:1.5px solid var(--border);font-size:12px;font-weight:700;background:var(--bg)">
+                    <option value="30">30 days</option>
+                    <option value="60" selected>60 days</option>
+                    <option value="90">90 days</option>
+                    <option value="180">180 days</option>
+                  </select>
+                </div>
+              </div>
+              <button class="af-submit" style="margin:0;padding:9px 14px;font-size:12px;min-width:80px;background:var(--red)" onclick="cleanupPurgeArchived()">Purge</button>
+            </div>
+
+            <!-- Fix expired sales -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--ink)">🏷️ Clear Expired Sales</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">Turn off <em>onSale</em> for products past their sale end date</div>
+              </div>
+              <button class="af-submit" style="margin:0;padding:9px 14px;font-size:12px;min-width:80px" onclick="cleanupExpiredSales()">Run</button>
+            </div>
+
+            <!-- Hide out-of-stock -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--ink)">🚫 Hide Out-of-Stock</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">Set <em>hidden</em> flag on products with stock = 0</div>
+              </div>
+              <button class="af-submit" style="margin:0;padding:9px 14px;font-size:12px;min-width:80px" onclick="cleanupHideOOS()">Run</button>
+            </div>
+
+            <div id="cleanup-log" style="display:none;margin-top:12px;padding:10px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:12px;color:#15803d;font-weight:600;line-height:1.6"></div>
+          </div>
+
           <div class="cp-section">
             <div class="cp-section-title">🔐 Change Admin PIN</div>
             <p class="cp-hint">Enter your current PIN and security key, then set a new 6-digit PIN.</p>
@@ -2923,6 +2977,64 @@ setTimeout(()=>{
   const el = document.getElementById('home-loading');
   if(el) el.innerHTML = `<div style="font-size:32px;margin-bottom:8px">😔</div><p>No products yet — check back soon!</p>`;
 }, 8000);
+
+/* ════ MAINTENANCE / CLEANUP ════ */
+function showCleanupLog(msg){
+  const el = document.getElementById('cleanup-log');
+  if(!el) return;
+  el.style.display = 'block';
+  el.innerHTML = msg;
+  setTimeout(()=>{ el.style.display='none'; }, 6000);
+}
+
+window.cleanupArchiveDelivered = async function(){
+  const targets = ORDERS.filter(o => !o.archived && o.status === 'delivered');
+  if(!targets.length){ toast('✅ Nothing to archive'); return; }
+  if(!confirm(`Archive ${targets.length} delivered order(s)?`)) return;
+  try {
+    await Promise.all(targets.map(o => updateDoc(doc(db, ORDERS_COLL, o._id), { archived: true })));
+    showCleanupLog(`✅ Archived ${targets.length} delivered order${targets.length!==1?'s':''}.`);
+    toast(`🗃️ ${targets.length} orders archived`);
+  } catch(e){ toast('❌ '+e.message); }
+};
+
+window.cleanupPurgeArchived = async function(){
+  const days = parseInt(document.getElementById('purge-days').value) || 60;
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const targets = ORDERS.filter(o =>
+    o.archived && o.createdAt?.seconds && (o.createdAt.seconds * 1000) < cutoff
+  );
+  if(!targets.length){ toast(`✅ No archived orders older than ${days} days`); return; }
+  if(!confirm(`Permanently delete ${targets.length} archived order(s) older than ${days} days? This cannot be undone.`)) return;
+  try {
+    await Promise.all(targets.map(o => deleteDoc(doc(db, ORDERS_COLL, o._id))));
+    showCleanupLog(`🗑️ Deleted ${targets.length} archived order${targets.length!==1?'s':''} older than ${days} days.`);
+    toast(`🗑️ ${targets.length} orders purged`);
+  } catch(e){ toast('❌ '+e.message); }
+};
+
+window.cleanupExpiredSales = async function(){
+  const now = new Date();
+  const expired = PRODUCTS.filter(p => p.onSale && p.saleUntil && new Date(p.saleUntil) < now);
+  if(!expired.length){ toast('✅ No expired sales found'); return; }
+  if(!confirm(`Clear onSale flag on ${expired.length} product(s) with expired sale dates?`)) return;
+  try {
+    await Promise.all(expired.map(p => updateDoc(doc(db, COLL, p._id), { onSale: false, salePrice: null, saleUntil: null })));
+    showCleanupLog(`🏷️ Cleared expired sale on ${expired.length} product${expired.length!==1?'s':''}: ${expired.map(p=>p.name).join(', ')}.`);
+    toast(`🏷️ ${expired.length} expired sale${expired.length!==1?'s':''} cleared`);
+  } catch(e){ toast('❌ '+e.message); }
+};
+
+window.cleanupHideOOS = async function(){
+  const oos = PRODUCTS.filter(p => !p.hidden && p.stock !== null && p.stock !== undefined && Number(p.stock) <= 0);
+  if(!oos.length){ toast('✅ No visible out-of-stock products'); return; }
+  if(!confirm(`Hide ${oos.length} out-of-stock product(s)?`)) return;
+  try {
+    await Promise.all(oos.map(p => updateDoc(doc(db, COLL, p._id), { hidden: true })));
+    showCleanupLog(`🚫 Hidden ${oos.length} out-of-stock product${oos.length!==1?'s':''}: ${oos.map(p=>p.name).join(', ')}.`);
+    toast(`🚫 ${oos.length} product${oos.length!==1?'s':''} hidden`);
+  } catch(e){ toast('❌ '+e.message); }
+};
 
 /* ════ HERO SLIDESHOW ════ */
 (function(){
