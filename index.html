@@ -1579,7 +1579,7 @@ const NAV_MAP = {
   wishlist:'bn-me', me:'bn-me', admin:'bn-me',
 };
 
-window.go = function(sec) {
+window.go = function(sec, fromPop) {
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.bn-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+sec)?.classList.add('active');
@@ -1592,7 +1592,13 @@ window.go = function(sec) {
     const tab = document.getElementById('tab-orders');
     if(tab && tab.style.display !== 'none') renderAdmOrders();
   }
+  if(!fromPop) history.pushState({sec}, '', '#'+sec);
 };
+
+window.addEventListener('popstate', function(e){
+  const sec = e.state?.sec || 'home';
+  go(sec, true);
+});
 
 /* ════ SEARCH ════ */
 window.doSearch = function(q){
@@ -2493,6 +2499,7 @@ window.setBranch = function(key){
 
 /* ── INIT ── */
 updateCartUI();
+history.replaceState({sec:'home'}, '', '#home');
 go('home');
 updateSubcatOptions('ap');
 updateSubcatOptions('ep');
