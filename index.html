@@ -334,26 +334,70 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
   font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;
   padding:14px 12px 10px;color:var(--ink);border-bottom:1px solid var(--border);
 }
-.cat-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:1px;
-  background:var(--border);
+/* ── 2-column category tile grid ── */
+.cat-tile-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 12px 16px}
+.cat-tile{
+  position:relative;border-radius:14px;overflow:hidden;
+  height:150px;cursor:pointer;background:#1a0a0c;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
 }
-.cat-card{
-  background:var(--card);cursor:pointer;
-  display:flex;align-items:center;gap:12px;padding:14px 14px;
-  transition:background .15s;
+.cat-tile.full{grid-column:1/-1;height:120px}
+.cat-tile-bg{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background-size:cover;background-position:center;
+  transition:transform .3s ease;
 }
-.cat-card:active{background:var(--bg2)}
-.cat-card-img{
-  width:64px;height:64px;border-radius:var(--r);overflow:hidden;flex-shrink:0;
-  background:var(--bg2);display:flex;align-items:center;justify-content:center;
+.cat-tile:active .cat-tile-bg{transform:scale(1.05)}
+.cat-tile-overlay{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:linear-gradient(to top,rgba(0,0,0,.78) 0%,rgba(0,0,0,.1) 65%);
 }
-.cat-card-img img{width:100%;height:100%;object-fit:cover}
-.cat-card-emoji{font-size:30px}
-.cat-card-info{flex:1;min-width:0}
-.cat-card-name{font-weight:700;font-size:14px;color:var(--ink);margin-bottom:2px}
-.cat-card-count{font-size:11px;color:var(--muted)}
-.cat-card-arrow{color:var(--muted);font-size:16px}
+.cat-tile-info{position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:1}
+.cat-tile-name{
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;
+  font-size:20px;color:#fff;text-transform:uppercase;line-height:1;
+}
+.cat-tile-count{font-size:11px;color:rgba(255,255,255,.65);margin-top:3px}
+.cat-tile-arr{
+  position:absolute;top:10px;right:10px;
+  background:rgba(255,255,255,.2);color:#fff;border-radius:50%;
+  width:22px;height:22px;display:flex;align-items:center;
+  justify-content:center;font-size:13px;z-index:1;
+}
+/* ── Sub-category bottom sheet ── */
+.sub-sheet{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.5);z-index:999;
+  display:flex;align-items:flex-end;
+}
+.sub-sheet-inner{
+  background:#fff;width:100%;border-radius:20px 20px 0 0;
+  padding:20px 16px 32px;max-height:70vh;overflow-y:auto;
+}
+.sub-sheet-title{
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;
+  font-size:22px;text-transform:uppercase;margin-bottom:14px;color:var(--ink);
+}
+.sub-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.sub-chip{
+  padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;
+  border:2px solid var(--border);color:var(--ink);cursor:pointer;
+  transition:all .2s;background:#fff;
+}
+.sub-chip.active{background:var(--red);color:#fff;border-color:var(--red)}
+/* ── Sub-filter bar in shop ── */
+.sub-filter-bar{
+  display:none;gap:8px;padding:8px 12px;overflow-x:auto;
+  scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--bg);
+}
+.sub-filter-bar.show{display:flex}
+.sub-filter-bar::-webkit-scrollbar{display:none}
+.sub-filter-chip{
+  flex-shrink:0;padding:5px 12px;border-radius:16px;
+  font-size:12px;font-weight:700;border:1.5px solid var(--border);
+  color:var(--ink);cursor:pointer;white-space:nowrap;background:#fff;
+}
+.sub-filter-chip.active{background:var(--red);color:#fff;border-color:var(--red)}
 
 /* ─── FILTERS ─── */
 .filters{display:flex;flex-direction:column;gap:8px;padding:10px 12px 0;background:var(--bg)}
@@ -380,7 +424,15 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
 
 /* ─── ME SECTION ─── */
 .me-hero{
-  background:var(--dark);color:#fff;padding:28px 16px 24px;text-align:center;
+  position:relative;overflow:hidden;
+  color:#fff;padding:40px 16px 28px;text-align:center;
+  min-height:200px;
+  background:#1a0a0c;
+}
+.me-hero-bg{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:url('https://res.cloudinary.com/dxxiujvrw/image/upload/v1779098112/1779097768078_wloqra.jpg') center center/cover no-repeat;
+  opacity:0.55;z-index:0;
 }
 .me-icon{font-size:52px;margin-bottom:10px}
 .me-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;margin-bottom:4px}
@@ -865,37 +917,8 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
   <div class="section" id="sec-category">
     <div class="cat-page">
       <div class="cat-page-title">Browse Categories</div>
-      <div class="cat-grid">
-        <div class="cat-card" onclick="go('women')">
-          <div class="cat-card-img"><img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=140&h=140&fit=crop&auto=format" onerror="this.parentNode.innerHTML='<span class=cat-card-emoji>👗</span>'"></div>
-          <div class="cat-card-info"><div class="cat-card-name">Women</div><div class="cat-card-count">Dresses, Tops & More</div></div>
-          <span class="cat-card-arrow">›</span>
-        </div>
-        <div class="cat-card" onclick="go('men')">
-          <div class="cat-card-img"><img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=140&h=140&fit=crop&auto=format" onerror="this.parentNode.innerHTML='<span class=cat-card-emoji>👔</span>'"></div>
-          <div class="cat-card-info"><div class="cat-card-name">Men</div><div class="cat-card-count">Shirts, Trousers & More</div></div>
-          <span class="cat-card-arrow">›</span>
-        </div>
-        <div class="cat-card" onclick="go('kids')">
-          <div class="cat-card-img"><img src="https://images.unsplash.com/photo-1519457431-44ccd64a579b?w=140&h=140&fit=crop&auto=format" onerror="this.parentNode.innerHTML='<span class=cat-card-emoji>🧒</span>'"></div>
-          <div class="cat-card-info"><div class="cat-card-name">Kids</div><div class="cat-card-count">Boys, Girls & Babies</div></div>
-          <span class="cat-card-arrow">›</span>
-        </div>
-        <div class="cat-card" onclick="go('shoes')">
-          <div class="cat-card-img"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=140&h=140&fit=crop&auto=format" onerror="this.parentNode.innerHTML='<span class=cat-card-emoji>👟</span>'"></div>
-          <div class="cat-card-info"><div class="cat-card-name">Shoes</div><div class="cat-card-count">Sneakers, Heels & More</div></div>
-          <span class="cat-card-arrow">›</span>
-        </div>
-        <div class="cat-card" onclick="go('bags')">
-          <div class="cat-card-img"><img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=140&h=140&fit=crop&auto=format" onerror="this.parentNode.innerHTML='<span class=cat-card-emoji>👜</span>'"></div>
-          <div class="cat-card-info"><div class="cat-card-name">Bags</div><div class="cat-card-count">Handbags, Backpacks</div></div>
-          <span class="cat-card-arrow">›</span>
-        </div>
-        <div class="cat-card" onclick="go('sale')">
-          <div class="cat-card-img" style="background:rgba(229,37,60,.1)"><span class="cat-card-emoji">🔥</span></div>
-          <div class="cat-card-info"><div class="cat-card-name" style="color:var(--red)">Sale</div><div class="cat-card-count">Up to 70% off</div></div>
-          <span class="cat-card-arrow">›</span>
-        </div>
+      <div class="cat-tile-grid" id="cat-tile-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Loading categories...</div>
       </div>
     </div>
   </div>
@@ -903,9 +926,10 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
   <!-- ═══ SHOP / TRENDS ═══ -->
   <div class="section" id="sec-shop">
     <div class="sh"><div class="sh-title">All Products</div></div>
+    <div class="sub-filter-bar" id="sub-filter-bar"></div>
     <div class="filters">
       <div class="filter-row">
-        <select class="fsel" id="cat-filter" onchange="doFilter()">
+        <select class="fsel" id="cat-filter" onchange="_selectedSub=null;renderSubFilterBar(this.value,null);doFilter()">
           <option value="">All Categories</option>
           <option value="women">👗 Women</option>
           <option value="men">👔 Men</option>
@@ -977,9 +1001,11 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
   <!-- ═══ ME (Track + About) ═══ -->
   <div class="section" id="sec-me">
     <div class="me-hero">
-      <div class="me-icon">👗</div>
-      <div class="me-title">SHADE'S APPAREL</div>
-      <div class="me-sub">Katunjila Road 120, Lusaka</div>
+      <div class="me-hero-bg"></div>
+      <div style="position:relative;z-index:1">
+        <div class="me-title">SHADE'S APPAREL</div>
+        <div class="me-sub">Katunjila Road 120, Lusaka</div>
+      </div>
     </div>
 
     <div class="me-section-title">Track Your Order</div>
@@ -1086,13 +1112,14 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
               <div class="af-grp"><label>Old Price (K)</label><input id="ap-old" type="number" placeholder="399"></div>
               <div class="af-grp">
                 <label>Category *</label>
-                <select id="ap-category">
+                <select id="ap-category" onchange="updateSubcatOptions('ap')">
                   <option value="women">👗 Women</option>
                   <option value="men">👔 Men</option>
                   <option value="kids">🧒 Kids</option>
                   <option value="shoes">👟 Shoes</option>
                   <option value="bags">👜 Bags</option>
-                  <option value="other">Other</option>
+                  <option value="jerseys">⚽ Jerseys</option>
+                  <option value="accessories">💍 Accessories</option>
                 </select>
               </div>
             </div>
@@ -1113,6 +1140,11 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
             <div class="af-row" style="background:#fff8f0;border:1px solid #ff6b00;border-radius:8px;padding:10px;gap:8px;">
               <div class="af-grp" style="margin:0"><label>🔥 Bundle Qty (e.g. 2)</label><input id="ap-bundle-qty" type="number" placeholder="2" min="2"></div>
               <div class="af-grp" style="margin:0"><label>Bundle Price (K)</label><input id="ap-bundle-price" type="number" placeholder="250"></div>
+            </div>
+            <div class="af-grp"><label>Sub-category</label>
+              <select id="ap-subcat" onchange="">
+                <option value="">— Select category first —</option>
+              </select>
             </div>
             <label class="af-check"><input type="checkbox" id="ap-featured"> Show on home page (Featured)</label>
             <div class="af-grp">
@@ -1143,13 +1175,14 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
               <div class="af-grp"><label>Old Price (K)</label><input id="ep-old" type="number"></div>
               <div class="af-grp">
                 <label>Category</label>
-                <select id="ep-category">
+                <select id="ep-category" onchange="updateSubcatOptions('ep')">
                   <option value="women">👗 Women</option>
                   <option value="men">👔 Men</option>
                   <option value="kids">🧒 Kids</option>
                   <option value="shoes">👟 Shoes</option>
                   <option value="bags">👜 Bags</option>
-                  <option value="other">Other</option>
+                  <option value="jerseys">⚽ Jerseys</option>
+                  <option value="accessories">💍 Accessories</option>
                 </select>
               </div>
             </div>
@@ -1170,6 +1203,11 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
             <div class="af-row" style="background:#fff8f0;border:1px solid #ff6b00;border-radius:8px;padding:10px;gap:8px;">
               <div class="af-grp" style="margin:0"><label>🔥 Bundle Qty</label><input id="ep-bundle-qty" type="number" placeholder="2" min="2"></div>
               <div class="af-grp" style="margin:0"><label>Bundle Price (K)</label><input id="ep-bundle-price" type="number" placeholder="250"></div>
+            </div>
+            <div class="af-grp"><label>Sub-category</label>
+              <select id="ep-subcat">
+                <option value="">— None —</option>
+              </select>
             </div>
             <label class="af-check"><input type="checkbox" id="ep-featured"> Featured on home page</label>
             <div class="af-grp">
@@ -1263,7 +1301,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, getDoc, setDoc, serverTimestamp }
+import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, getDoc, setDoc, serverTimestamp, query, where, getDocs }
   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 /* ══ FIREBASE CONFIG ══ */
@@ -1307,6 +1345,135 @@ const STATUS_LABELS = {pending:'Pending',confirmed:'Confirmed',packing:'Packing'
 /* ── Helper: get category from product (handles both old 'sport' field and new 'category') ── */
 function getCat(p){ return p.category || p.sport || 'other'; }
 
+/* ════ SUBCATEGORY OPTIONS ════ */
+const SUBCAT_OPTIONS = {
+  women:       ['Dresses','Tops','Jeans','Skirts','Jackets','Shorts','Jumpsuits','Tracksuits'],
+  men:         ['T-Shirts','Shirts','Jeans','Jackets','Shorts','Suits','Tracksuits','Hoodies'],
+  kids:        ['Girls','Boys','Baby','School Uniforms','Tracksuits'],
+  shoes:       ['Sneakers','Heels','Boots','Sandals','Loafers','Flats','Slides'],
+  bags:        ['Handbags','Backpacks','Clutches','Wallets','Tote Bags'],
+  jerseys:     ['Football','Basketball','Rugby','Cricket'],
+  accessories: ['Belts','Caps','Watches','Sunglasses','Jewellery','Scarves'],
+};
+
+function updateSubcatOptions(prefix, currentVal=''){
+  const cat = document.getElementById(prefix+'-category')?.value || '';
+  const sel = document.getElementById(prefix+'-subcat');
+  if(!sel) return;
+  const opts = SUBCAT_OPTIONS[cat] || [];
+  sel.innerHTML = `<option value="">— None —</option>`
+    + opts.map(s=>`<option value="${s}" ${s===currentVal?'selected':''}>${s}</option>`).join('');
+}
+const CAT_META = {
+  women:       { label:'Women',       icon:'👗', grad:'#c94b6a,#6b1a30' },
+  men:         { label:'Men',         icon:'👔', grad:'#1a3a8b,#0d1f4f' },
+  kids:        { label:'Kids',        icon:'🧒', grad:'#f59e0b,#b45309' },
+  shoes:       { label:'Shoes',       icon:'👟', grad:'#16a34a,#14532d' },
+  bags:        { label:'Bags',        icon:'👜', grad:'#7c3aed,#4c1d95' },
+  accessories: { label:'Accessories', icon:'💍', grad:'#ea580c,#7c2d12' },
+  jerseys:     { label:'Jerseys',     icon:'⚽', grad:'#0369a1,#0c4a6e' },
+  other:       { label:'Other',       icon:'🛍️', grad:'#374151,#111827' },
+};
+
+function renderCatGrid(){
+  const grid = document.getElementById('cat-tile-grid');
+  if(!grid) return;
+  const tiles = Object.entries(CAT_META).map(([key, meta])=>{
+    const prods = PRODUCTS.filter(p=>getCat(p)===key);
+    if(!prods.length) return '';
+    const img = prods.find(p=>p.image)?.image || null;
+    const count = prods.length;
+    const bg = img
+      ? `background-image:url('${img}')`
+      : `background:linear-gradient(135deg,${meta.grad})`;
+    return `<div class="cat-tile" onclick="openCatSubs('${key}')">
+      <div class="cat-tile-bg" style="${bg}"></div>
+      <div class="cat-tile-overlay"></div>
+      <div class="cat-tile-arr">›</div>
+      <div class="cat-tile-info">
+        <div class="cat-tile-name">${meta.label}</div>
+        <div class="cat-tile-count">${count} item${count!==1?'s':''}</div>
+      </div>
+    </div>`;
+  }).filter(Boolean);
+  if(!tiles.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No products yet</div>`;
+    return;
+  }
+  // Make last tile full-width if odd count
+  if(tiles.length % 2 !== 0){
+    tiles[tiles.length-1] = tiles[tiles.length-1].replace('class="cat-tile"','class="cat-tile full"');
+  }
+  grid.innerHTML = tiles.join('');
+}
+
+let _selectedCat = null, _selectedSub = null;
+
+window.openCatSubs = function(catKey){
+  const meta = CAT_META[catKey] || {label:catKey, icon:'🛍️'};
+  const prods = PRODUCTS.filter(p=>getCat(p)===catKey);
+  const subs = [...new Set(prods.filter(p=>p.subcategory).map(p=>p.subcategory.trim()))].sort();
+  _selectedCat = catKey; _selectedSub = null;
+  if(!subs.length){
+    // No sub-categories — go straight to shop
+    applySubFilter(); return;
+  }
+  const sheet = document.createElement('div');
+  sheet.className = 'sub-sheet';
+  sheet.innerHTML = `
+    <div class="sub-sheet-inner">
+      <div class="sub-sheet-title">${meta.icon} ${meta.label}</div>
+      <div class="sub-chips">
+        <div class="sub-chip active" onclick="selectSub('${catKey}',null,this)">All ${meta.label} (${prods.length})</div>
+        ${subs.map(s=>{
+          const cnt = prods.filter(p=>p.subcategory?.trim()===s).length;
+          return `<div class="sub-chip" onclick="selectSub('${catKey}','${s.replace(/'/g,"\\'")}',this)">${s} (${cnt})</div>`;
+        }).join('')}
+      </div>
+      <button class="btn-primary" style="width:100%" onclick="applySubFilter()">Browse →</button>
+    </div>`;
+  sheet.addEventListener('click', ev=>{if(ev.target===sheet) sheet.remove();});
+  document.body.appendChild(sheet);
+};
+
+window.selectSub = function(cat, sub, el){
+  _selectedCat = cat; _selectedSub = sub||null;
+  el.closest('.sub-chips').querySelectorAll('.sub-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+};
+
+window.applySubFilter = function(){
+  document.querySelector('.sub-sheet')?.remove();
+  // Set category filter dropdown
+  const cf = document.getElementById('cat-filter');
+  if(cf) cf.value = _selectedCat || '';
+  // Render sub-filter bar in shop
+  renderSubFilterBar(_selectedCat, _selectedSub);
+  go('shop'); doFilter();
+};
+
+function renderSubFilterBar(catKey, activeSub){
+  const bar = document.getElementById('sub-filter-bar');
+  if(!bar) return;
+  if(!catKey){ bar.classList.remove('show'); bar.innerHTML=''; return; }
+  const prods = PRODUCTS.filter(p=>getCat(p)===catKey);
+  const subs = [...new Set(prods.filter(p=>p.subcategory).map(p=>p.subcategory.trim()))].sort();
+  if(!subs.length){ bar.classList.remove('show'); bar.innerHTML=''; return; }
+  const meta = CAT_META[catKey] || {label:catKey};
+  bar.classList.add('show');
+  bar.innerHTML = [
+    `<div class="sub-filter-chip ${!activeSub?'active':''}" onclick="applySubChip('${catKey}',null,this)">All ${meta.label}</div>`,
+    ...subs.map(s=>`<div class="sub-filter-chip ${activeSub===s?'active':''}" onclick="applySubChip('${catKey}','${s.replace(/'/g,"\\'")}',this)">${s}</div>`)
+  ].join('');
+}
+
+window.applySubChip = function(cat, sub, el){
+  _selectedCat=cat; _selectedSub=sub||null;
+  el.closest('.sub-filter-bar').querySelectorAll('.sub-filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  doFilter();
+};
+
 /* ── Load products ── */
 onSnapshot(collection(db, COLL), snap => {
   PRODUCTS = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
@@ -1321,22 +1488,33 @@ onSnapshot(collection(db, COLL), snap => {
   if (document.getElementById('adm-dash').style.display === 'block') renderAdmList();
 });
 
-/* ── Load orders ── */
+/* ── Orders listener (admin only) ── */
+let _ordersUnsub = null;
 let _ordersUpdating = false;
-onSnapshot(collection(db, ORDERS_COLL), async snap => {
-  const newOrders = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
-  ORDERS = newOrders;
-  const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-  const expired = newOrders.filter(o =>
-    o.status === 'delivered' && o.createdAt?.seconds && (o.createdAt.seconds * 1000) < thirtyDaysAgo
-  );
-  if(expired.length){
-    await Promise.all(expired.map(o => deleteDoc(doc(db, ORDERS_COLL, o._id))));
-  }
-  if (_ordersUpdating) return;
-  const tab = document.getElementById('tab-orders');
-  if (tab && tab.style.display !== 'none') renderAdmOrders();
-});
+
+function startOrdersListener(){
+  if(_ordersUnsub) return; // already listening
+  _ordersUnsub = onSnapshot(collection(db, ORDERS_COLL), async snap => {
+    const newOrders = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+    ORDERS = newOrders;
+    // Auto-delete orders delivered 30+ days ago
+    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+    const expired = newOrders.filter(o =>
+      o.status === 'delivered' && o.createdAt?.seconds && (o.createdAt.seconds * 1000) < thirtyDaysAgo
+    );
+    if(expired.length){
+      await Promise.all(expired.map(o => deleteDoc(doc(db, ORDERS_COLL, o._id))));
+    }
+    if(_ordersUpdating) return;
+    const tab = document.getElementById('tab-orders');
+    if(tab && tab.style.display !== 'none') renderAdmOrders();
+  });
+}
+
+function stopOrdersListener(){
+  if(_ordersUnsub){ _ordersUnsub(); _ordersUnsub = null; }
+  ORDERS = [];
+}
 
 /* ════ CARD RENDER (SHEIN flash-item style) ════ */
 function card(p) {
@@ -1382,6 +1560,7 @@ function loadSec(sec) {
   switch(sec) {
     case 'home':     render('home-grid',  all.filter(p=>p.featured).slice(0,10)); break;
     case 'shop':     doFilter();           break;
+    case 'category': renderCatGrid();      break;
     case 'women':    render('women-grid', all.filter(p=>getCat(p)==='women')); break;
     case 'men':      render('men-grid',   all.filter(p=>getCat(p)==='men')); break;
     case 'kids':     render('kids-grid',  all.filter(p=>getCat(p)==='kids')); break;
@@ -1432,12 +1611,14 @@ window.doFilter = function(){
   const q     = (document.getElementById('shop-search')?.value || '').toLowerCase();
   let items = [...PRODUCTS];
   if(cat)   items = items.filter(p=>getCat(p)===cat);
+  if(_selectedSub && _selectedCat===cat) items = items.filter(p=>p.subcategory?.trim()===_selectedSub);
   if(badge) items = items.filter(p=>p.badge===badge);
   if(q)     items = items.filter(p=>
     (p.name||'').toLowerCase().includes(q) ||
     (getCat(p)).toLowerCase().includes(q)  ||
     (p.desc||'').toLowerCase().includes(q) ||
-    (p.badge||'').toLowerCase().includes(q)
+    (p.badge||'').toLowerCase().includes(q)||
+    (p.subcategory||'').toLowerCase().includes(q)
   );
   items = sortItems(items);
   render('shop-grid', items);
@@ -1838,12 +2019,24 @@ window.toast = function(msg){
 };
 
 /* ════ ORDER TRACKING ════ */
-window.trackOrder = function(){
+window.trackOrder = async function(){
   const num = document.getElementById('track-input').value.trim().toUpperCase();
   if(!num){ toast('⚠️ Enter an order number'); return; }
-  const order = ORDERS.find(o=>o.orderNum===num);
-  if(!order){ document.getElementById('track-result').innerHTML=`<div class="track-form"><p style="color:var(--red);font-weight:700">❌ Order "${num}" not found. Check your order number.</p></div>`; return; }
-  renderTrackResult(order);
+  const resultEl = document.getElementById('track-result');
+  resultEl.innerHTML = `<div class="track-form"><p style="text-align:center;padding:20px;color:var(--muted)">🔍 Searching...</p></div>`;
+  try {
+    const q = query(collection(db, ORDERS_COLL), where('orderNum','==',num));
+    const snap = await getDocs(q);
+    if(snap.empty){
+      resultEl.innerHTML = `<div class="track-form"><p style="color:var(--red);font-weight:700">❌ Order "${num}" not found. Check your order number.</p></div>`;
+      return;
+    }
+    const order = { _id: snap.docs[0].id, ...snap.docs[0].data() };
+    renderTrackResult(order);
+    if(order.status==='dispatched'||order.status==='delivered') showDeliveryMap(order);
+  } catch(err){
+    resultEl.innerHTML = `<div class="track-form"><p style="color:var(--red);font-weight:700">⚠️ Could not fetch order. Check your connection.</p></div>`;
+  }
 };
 
 function renderTrackResult(order){
@@ -1919,6 +2112,7 @@ async function checkPin(){
   if(pinInput===correct){
     document.getElementById('admin-lock').style.display='none';
     document.getElementById('adm-dash').style.display='block';
+    startOrdersListener();
     renderAdmList(); renderAdmOrders();
   } else {
     document.getElementById('pin-err').textContent='Incorrect PIN. Try again.';
@@ -1928,6 +2122,7 @@ async function checkPin(){
 
 window.adminLogout = function(){
   pinInput=''; updatePinDots();
+  stopOrdersListener();
   document.getElementById('admin-lock').style.display='block';
   document.getElementById('adm-dash').style.display='none';
   go('home');
@@ -2033,12 +2228,14 @@ window.admAddProduct = async function(){
       image:      imageUrl,
       bundleQty:  parseInt(document.getElementById('ap-bundle-qty').value)||null,
       bundlePrice:parseFloat(document.getElementById('ap-bundle-price').value)||null,
+      subcategory:document.getElementById('ap-subcat').value.trim()||null,
       createdAt:  serverTimestamp()
     });
     toast('✅ Product added!');
-    ['ap-name','ap-price','ap-old','ap-icon','ap-sizes','ap-desc','ap-bundle-qty','ap-bundle-price','ap-badge'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['ap-name','ap-price','ap-old','ap-icon','ap-sizes','ap-desc','ap-bundle-qty','ap-bundle-price','ap-badge','ap-subcat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     document.getElementById('ap-category').value='women';
     document.getElementById('ap-featured').checked=false;
+    updateSubcatOptions('ap');
     document.getElementById('ap-img-preview').style.display='none';
     document.getElementById('ap-img-label').style.display='block';
     document.getElementById('ap-img-file').value='';
@@ -2061,6 +2258,7 @@ window.openEditPanel = function(id){
   document.getElementById('ep-featured').checked=!!p.featured;
   document.getElementById('ep-bundle-qty').value=p.bundleQty||'';
   document.getElementById('ep-bundle-price').value=p.bundlePrice||'';
+  updateSubcatOptions('ep', p.subcategory||'');
   if(p.image){ document.getElementById('ep-img-preview').src=p.image; document.getElementById('ep-img-preview').style.display='block'; document.getElementById('ep-img-label').style.display='none'; }
   else { document.getElementById('ep-img-preview').style.display='none'; document.getElementById('ep-img-label').style.display='block'; }
   const panel = document.getElementById('edit-panel');
@@ -2094,7 +2292,8 @@ window.admSaveEdit = async function(){
       featured:   document.getElementById('ep-featured').checked,
       image:      imageUrl,
       bundleQty:  parseInt(document.getElementById('ep-bundle-qty').value)||null,
-      bundlePrice:parseFloat(document.getElementById('ep-bundle-price').value)||null
+      bundlePrice:parseFloat(document.getElementById('ep-bundle-price').value)||null,
+      subcategory:document.getElementById('ep-subcat').value.trim()||null
     });
     toast('✅ Product updated!');
     closeEditPanel();
@@ -2295,6 +2494,8 @@ window.setBranch = function(key){
 /* ── INIT ── */
 updateCartUI();
 go('home');
+updateSubcatOptions('ap');
+updateSubcatOptions('ep');
 
 /* Loading timeout — if products don't load in 8s show fallback */
 setTimeout(()=>{
