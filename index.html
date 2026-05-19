@@ -599,6 +599,29 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
 }
 .pm-img img{width:100%;height:100%;object-fit:contain;padding:10px}
 .pm-img>span{font-size:80px}
+
+/* ─── GALLERY ─── */
+.gal-track{display:flex;width:100%;height:100%;transition:transform .3s cubic-bezier(.25,.46,.45,.94)}
+.gal-slide{flex:0 0 100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg2)}
+.gal-slide img{width:100%;height:100%;object-fit:contain;padding:10px}
+.gal-slide span{font-size:80px}
+.gal-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2}
+.gal-dot{width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,.25);transition:all .2s;cursor:pointer}
+.gal-dot.active{background:var(--red);width:18px;border-radius:4px}
+.gal-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.9);border:none;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh);cursor:pointer}
+.gal-arrow.prev{left:8px}.gal-arrow.next{right:8px}
+.gal-count{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);color:#fff;font-size:10px;font-weight:800;padding:3px 7px;border-radius:10px;z-index:2}
+
+/* ─── MULTI-PHOTO UPLOAD (ADMIN) ─── */
+.img-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.img-slot{aspect-ratio:1;border-radius:8px;border:2px dashed var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;overflow:hidden;transition:border-color .2s}
+.img-slot:hover{border-color:var(--red)}
+.img-slot.filled{border-style:solid;border-color:var(--border)}
+.img-slot img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+.img-slot-ico{font-size:22px;color:var(--muted)}
+.img-slot-lbl{font-size:10px;color:var(--muted);font-weight:700;margin-top:4px}
+.img-slot-del{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2}
+.img-slot input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:1}
 .pm-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 4px}
 .pm-back{
   position:absolute;top:10px;left:10px;z-index:1;
@@ -764,6 +787,66 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px}
 ::selection{background:rgba(229,37,60,.15);color:var(--ink)}
+
+/* ─── NEW IN BADGE ─── */
+.fi-new{position:absolute;top:7px;left:7px;background:#16a34a;color:#fff;font-size:9px;font-weight:900;letter-spacing:.8px;padding:3px 6px;border-radius:4px;text-transform:uppercase;z-index:2}
+
+/* ─── LOW STOCK ─── */
+.low-stock-tag{display:inline-block;background:#fff3cd;color:#92400e;font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;border:1px solid #fcd34d;margin-left:6px}
+.out-stock-tag{display:inline-block;background:#fee2e2;color:var(--red);font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;border:1px solid #fca5a5;margin-left:6px}
+
+/* ─── SALE ─── */
+.fi-sale-price{color:var(--red);font-weight:800}
+.pm-sale-end{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ─── SHARE BUTTON ─── */
+.pm-share-btn{width:100%;padding:13px;border-radius:var(--r-sm);background:none;border:1.5px solid #25d366;color:#16a34a;font-size:14px;font-weight:800;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif}
+
+/* ─── YOU MAY LIKE ─── */
+.you-like-wrap{padding:16px 0 0}
+.you-like-ttl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px;padding:0 16px}
+.you-like-row{display:flex;gap:10px;overflow-x:auto;padding:0 16px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.you-like-row::-webkit-scrollbar{display:none}
+.yl-card{flex:0 0 120px;cursor:pointer}
+.yl-img{width:120px;height:120px;border-radius:8px;overflow:hidden;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:6px}
+.yl-img img{width:100%;height:100%;object-fit:cover}
+.yl-name{font-size:11px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:2px}
+.yl-price{font-size:12px;font-weight:800;color:var(--red)}
+
+/* ─── SIZE GUIDE ─── */
+.size-guide-btn{width:100%;padding:10px;border-radius:var(--r-sm);background:none;border:1.5px solid var(--border);color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;font-family:'DM Sans',sans-serif}
+.sg-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(4px)}
+.sg-sheet{width:100%;max-width:480px;background:#fff;border-radius:16px 16px 0 0;padding:22px 18px 36px;max-height:80vh;overflow-y:auto}
+.sg-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
+.sg-table th{background:var(--ink);color:#fff;padding:8px;text-align:center;font-size:11px}
+.sg-table td{padding:7px 8px;text-align:center;border-bottom:1px solid var(--border)}
+.sg-table tr:nth-child(even) td{background:var(--bg2)}
+
+/* ─── SALES DASHBOARD ─── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.dash-card{background:var(--bg2);border-radius:var(--r);padding:14px;border:1px solid var(--border)}
+.dash-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--red);margin-bottom:2px}
+.dash-lbl{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.dash-section-ttl{font-size:13px;font-weight:800;color:var(--ink);margin:16px 0 10px;text-transform:uppercase;letter-spacing:.5px}
+.dash-top-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg2);border-radius:var(--r-sm);margin-bottom:7px;font-size:13px}
+.dash-top-name{font-weight:700;color:var(--ink);flex:1}
+.dash-top-count{font-size:12px;color:var(--muted);margin-left:8px}
+.dash-top-rev{font-weight:800;color:var(--red);margin-left:8px}
+.dash-status-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.dash-s-pill{flex:1;min-width:70px;background:var(--bg2);border-radius:var(--r-sm);padding:10px 8px;text-align:center;border:1px solid var(--border)}
+.dash-s-val{font-size:20px;font-weight:900;font-family:'Barlow Condensed',sans-serif}
+.dash-s-lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase}
+
+/* ─── STOCK FIELD ─── */
+.stock-row{display:flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;margin-bottom:10px}
+.sale-row{background:#fff8f0;border:1px solid #fed7aa;border-radius:8px;padding:10px;margin-bottom:10px}
+.sale-toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#ccc;border-radius:24px;cursor:pointer;transition:.3s}
+.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle-switch input:checked+.toggle-slider{background:var(--red)}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(20px)}
 </style>
 </head>
 <body>
@@ -1096,6 +1179,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
       <div class="adm-tabs">
         <button class="adm-tab active" id="tab-btn-products" onclick="admTab('products')">📦 Products</button>
         <button class="adm-tab" id="tab-btn-orders" onclick="admTab('orders')">🛒 Orders</button>
+        <button class="adm-tab" id="tab-btn-dashboard" onclick="admTab('dashboard')">📊 Sales</button>
         <button class="adm-tab" id="tab-btn-settings" onclick="admTab('settings')">⚙️ Settings</button>
       </div>
 
@@ -1148,11 +1232,25 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
             </div>
             <label class="af-check"><input type="checkbox" id="ap-featured"> Show on home page (Featured)</label>
             <div class="af-grp">
-              <label>Product Photo</label>
-              <div class="af-img-box">
-                <input type="file" accept="image/*" id="ap-img-file" onchange="previewAddImg(this)">
-                <img id="ap-img-preview" class="af-img-preview" style="display:none">
-                <div id="ap-img-label" class="af-img-label">📷 Tap to upload photo</div>
+              <label>Product Photos <span style="font-weight:400;font-size:10px;color:var(--muted)">(up to 5 — first photo is main)</span></label>
+              <div class="img-grid" id="ap-img-grid">
+                <!-- slots rendered by JS -->
+              </div>
+            </div>
+            <div class="stock-row">
+              <div class="af-grp" style="margin:0;flex:1"><label>📦 Stock Qty</label><input id="ap-stock" type="number" placeholder="e.g. 20" min="0"></div>
+              <div style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0">Leave blank = unlimited</div>
+            </div>
+            <div class="sale-row">
+              <div class="sale-toggle-row">
+                <label style="font-size:13px;font-weight:800;color:var(--ink)">🏷️ On Sale</label>
+                <label class="toggle-switch"><input type="checkbox" id="ap-on-sale" onchange="toggleSaleFields('ap')"><span class="toggle-slider"></span></label>
+              </div>
+              <div id="ap-sale-fields" style="display:none">
+                <div class="af-row" style="margin:0;gap:8px">
+                  <div class="af-grp" style="margin:0;flex:1"><label>Sale Price (K)</label><input id="ap-sale-price" type="number" placeholder="199"></div>
+                  <div class="af-grp" style="margin:0;flex:1"><label>Sale Ends</label><input id="ap-sale-until" type="date"></div>
+                </div>
               </div>
             </div>
             <button class="af-submit" id="ap-submit" onclick="admAddProduct()">✅ Add Product</button>
@@ -1210,12 +1308,26 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
               </select>
             </div>
             <label class="af-check"><input type="checkbox" id="ep-featured"> Featured on home page</label>
+            <div class="stock-row">
+              <div class="af-grp" style="margin:0;flex:1"><label>📦 Stock Qty</label><input id="ep-stock" type="number" placeholder="e.g. 20" min="0"></div>
+              <div style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0">Blank = unlimited</div>
+            </div>
+            <div class="sale-row">
+              <div class="sale-toggle-row">
+                <label style="font-size:13px;font-weight:800;color:var(--ink)">🏷️ On Sale</label>
+                <label class="toggle-switch"><input type="checkbox" id="ep-on-sale" onchange="toggleSaleFields('ep')"><span class="toggle-slider"></span></label>
+              </div>
+              <div id="ep-sale-fields" style="display:none">
+                <div class="af-row" style="margin:0;gap:8px">
+                  <div class="af-grp" style="margin:0;flex:1"><label>Sale Price (K)</label><input id="ep-sale-price" type="number" placeholder="199"></div>
+                  <div class="af-grp" style="margin:0;flex:1"><label>Sale Ends</label><input id="ep-sale-until" type="date"></div>
+                </div>
+              </div>
+            </div>
             <div class="af-grp">
-              <label>Replace Photo <span style="font-weight:400;font-size:10px">(leave blank to keep current)</span></label>
-              <div class="af-img-box">
-                <input type="file" accept="image/*" id="ep-img-file" onchange="previewEditImg(this)">
-                <img id="ep-img-preview" class="af-img-preview" style="display:none">
-                <div id="ep-img-label" class="af-img-label">📷 Tap to replace photo</div>
+              <label>Product Photos <span style="font-weight:400;font-size:10px;color:var(--muted)">(up to 5 — tap ❌ to remove)</span></label>
+              <div class="img-grid" id="ep-img-grid">
+                <!-- slots rendered by openEditPanel -->
               </div>
             </div>
             <button class="af-submit" id="ep-submit" onclick="admSaveEdit()">💾 Save Changes</button>
@@ -1246,6 +1358,11 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
           </button>
         </div>
         <div id="adm-orders-list"><div class="ao-empty">Loading orders...</div></div>
+      </div>
+
+      <!-- DASHBOARD TAB -->
+      <div id="tab-dashboard" style="display:none">
+        <div id="dash-content"><div class="ao-empty">Loading dashboard...</div></div>
       </div>
 
       <!-- SETTINGS TAB -->
@@ -1526,19 +1643,27 @@ function card(p) {
     : `<span class="fi-emoji">${p.icon||'🛍️'}</span>`;
   const disc = p.old ? `-${Math.round((1-p.price/p.old)*100)}%` : (p.badge?p.badge.toUpperCase():'');
   const hasBundle = p.bundleQty && p.bundlePrice;
+  // New In badge — added within last 7 days
+  const isNew = p.createdAt?.seconds && (Date.now()/1000 - p.createdAt.seconds) < 7*86400;
+  // Sale logic
+  const saleActive = p.onSale && p.salePrice && (!p.saleUntil || new Date(p.saleUntil) > new Date());
+  const displayPrice = saleActive ? p.salePrice : p.price;
+  const outOfStock = p.stock !== null && p.stock !== undefined && p.stock <= 0;
   return `
-  <div class="flash-item" onclick="openModal('${p._id}')">
+  <div class="flash-item" onclick="openModal('${p._id}')" ${outOfStock?'style="opacity:.6"':''}>
     <div class="fi-img">
       ${disc?`<span class="fi-disc">${disc}</span>`:''}
+      ${isNew&&!disc?`<span class="fi-new">NEW</span>`:''}
       ${thumb}
       <button class="fi-wish ${inWish?'on':''}" onclick="toggleWish(event,'${p._id}')">${inWish?'❤️':'🤍'}</button>
     </div>
     <div class="fi-body">
-      <div style="display:flex;align-items:center">
-        <span class="fi-price">K${p.price}</span>
-        ${p.old?`<span class="fi-price-old">K${p.old}</span>`:''}
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="fi-price ${saleActive?'fi-sale-price':''}">K${displayPrice}</span>
+        ${saleActive?`<span class="fi-price-old">K${p.price}</span>`:(p.old?`<span class="fi-price-old">K${p.old}</span>`:'')}
       </div>
       ${hasBundle?`<div><span class="fi-bundle">🔥 ${p.bundleQty} for K${p.bundlePrice}</span></div>`:''}
+      ${outOfStock?`<div style="font-size:10px;color:var(--red);font-weight:800">OUT OF STOCK</div>`:''}
       ${p.badge?`<div class="fi-tag">#${p.badge}${cat?'·'+cat:''}</div>`:`<div class="fi-tag">${cat}</div>`}
       <div class="fi-name">${p.name}</div>
     </div>
@@ -1875,19 +2000,60 @@ window.submitOrder = async function(){
 
 /* ════ PRODUCT MODAL ════ */
 window.openModal = function(id){
+  _galIdx = 0;
   const p = PRODUCTS.find(x=>x._id===id);
   if(!p) return;
   const inCart = cart.some(c=>c._id===id || c._id===id+'_bundle');
   const inWish = wishlist.includes(id);
   const sizes = (p.sizes||'').split(',').map(s=>s.trim()).filter(Boolean);
   const cat = getCat(p);
-  const _imgEl = p.image
-    ? `<button class="pm-back" onclick="document.getElementById('modal-wrap').classList.remove('open')">←</button>`
-      +`<img src="${p.image}" alt="${p.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:10px"
-          onerror="this.style.display='none';document.getElementById('pm-fb').style.display='flex'">`
-      +`<span id="pm-fb" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:80px">${p.icon||'🛍️'}</span>`
-    : `<button class="pm-back" onclick="document.getElementById('modal-wrap').classList.remove('open')">←</button>`
-      +`<span>${p.icon||'🛍️'}</span>`;
+  const saleActive = p.onSale && p.salePrice && (!p.saleUntil || new Date(p.saleUntil) > new Date());
+  const displayPrice = saleActive ? p.salePrice : p.price;
+  const outOfStock = p.stock !== null && p.stock !== undefined && p.stock <= 0;
+  const allImages = p.images?.length ? p.images : (p.image ? [p.image] : []);
+  let _imgEl;
+  if(allImages.length > 1){
+    const slides = allImages.map((url,i)=>`
+      <div class="gal-slide">
+        <img src="${url}" loading="${i===0?'eager':'lazy'}" onerror="this.style.display='none'">
+      </div>`).join('');
+    const dots = allImages.map((_,i)=>`<div class="gal-dot${i===0?' active':''}" onclick="galGoTo(${i})"></div>`).join('');
+    _imgEl = `
+      <button class="pm-back" onclick="document.getElementById('modal-wrap').classList.remove('open')">←</button>
+      <div class="gal-track" id="gal-track">${slides}</div>
+      <div class="gal-dots">${dots}</div>
+      <div class="gal-count" id="gal-count">1 / ${allImages.length}</div>
+      ${allImages.length>1?`<button class="gal-arrow prev" onclick="galStep(-1)">‹</button><button class="gal-arrow next" onclick="galStep(1)">›</button>`:''}`;
+  } else if(allImages.length===1){
+    _imgEl = `
+      <button class="pm-back" onclick="document.getElementById('modal-wrap').classList.remove('open')">←</button>
+      <img src="${allImages[0]}" alt="${p.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:10px"
+        onerror="this.style.display='none';document.getElementById('pm-fb').style.display='flex'">
+      <span id="pm-fb" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:80px">${p.icon||'🛍️'}</span>`;
+  } else {
+    _imgEl = `
+      <button class="pm-back" onclick="document.getElementById('modal-wrap').classList.remove('open')">←</button>
+      <span>${p.icon||'🛍️'}</span>`;
+  }
+  // You may also like
+  const related = PRODUCTS.filter(x=>x._id!==id && getCat(x)===cat).slice(0,6);
+  const youMayLike = related.length ? `
+    <div class="you-like-wrap">
+      <div class="you-like-ttl">You may also like</div>
+      <div class="you-like-row">
+        ${related.map(r=>{
+          const rSale = r.onSale && r.salePrice && (!r.saleUntil || new Date(r.saleUntil) > new Date());
+          return `<div class="yl-card" onclick="openModal('${r._id}')">
+            <div class="yl-img">${r.image?`<img src="${r.image}" loading="lazy">`:(r.icon||'🛍️')}</div>
+            <div class="yl-name">${r.name}</div>
+            <div class="yl-price">K${rSale?r.salePrice:r.price}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
+  // Size guide button
+  const sizeGuideBtn = sizes.length && (cat==='women'||cat==='men'||cat==='kids'||cat==='shoes')
+    ? `<button class="size-guide-btn" onclick="showSizeGuide('${cat}')">📏 Size Guide</button>` : '';
   document.getElementById('pm-content').innerHTML = `
     <div class="pm-img">${_imgEl}</div>
     <div class="pm-body">
@@ -1895,14 +2061,17 @@ window.openModal = function(id){
       <div class="pm-sport">${cat}</div>
       <div class="pm-name">${p.name}</div>
       <div class="pm-price-row">
-        <div class="pm-price">K${p.price}</div>
-        ${p.old?`<div class="pm-old">K${p.old}</div><div class="pm-disc">-${Math.round((1-p.price/p.old)*100)}%</div>`:''}
+        <div class="pm-price ${saleActive?'fi-sale-price':''}">K${displayPrice}</div>
+        ${saleActive?`<div class="pm-old">K${p.price}</div><div class="pm-disc">SALE</div>`
+          :(p.old?`<div class="pm-old">K${p.old}</div><div class="pm-disc">-${Math.round((1-p.price/p.old)*100)}%</div>`:'')}
       </div>
+      ${saleActive && p.saleUntil?`<div class="pm-sale-end">⏰ Sale ends ${new Date(p.saleUntil).toLocaleDateString('en-ZM',{day:'numeric',month:'short'})}</div>`:''}
+      ${outOfStock?`<div style="background:#fee2e2;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:800;color:var(--red);margin-bottom:10px">❌ Out of Stock</div>`:''}
       ${(p.bundleQty&&p.bundlePrice)?`
       <div class="bundle-selector">
         <div class="bundle-opt active" id="bopt-single" onclick="selBundle('single','${id}')">
           <div class="bundle-opt-label">Single</div>
-          <div class="bundle-opt-price">K${p.price}</div>
+          <div class="bundle-opt-price">K${displayPrice}</div>
           <div class="bundle-save">1 item</div>
         </div>
         <div class="bundle-opt" id="bopt-bundle" onclick="selBundle('bundle','${id}')">
@@ -1914,14 +2083,17 @@ window.openModal = function(id){
       ${p.desc?`<div class="pm-desc">${p.desc}</div>`:''}
       ${sizes.length?`<div class="pm-lbl">Select Size</div>
       <div class="pm-sizes">${sizes.map(s=>`<button class="psize" onclick="selSize(this)">${s}</button>`).join('')}</div>`:''}
-      <button class="pm-cta ${inCart?'on':''}" id="modal-cta" onclick="modalAddCart('${id}')">
-        ${inCart?'✓ Added to Cart':'🛒 Add to Cart'}
+      ${sizeGuideBtn}
+      <button class="pm-cta ${outOfStock?'':''}${inCart?' on':''}" id="modal-cta" onclick="modalAddCart('${id}')" ${outOfStock?'disabled style="opacity:.5;cursor:not-allowed"':''}>
+        ${outOfStock?'❌ Out of Stock':(inCart?'✓ Added to Cart':'🛒 Add to Cart')}
       </button>
       <button class="pm-wish-btn" onclick="toggleWish(null,'${id}')">${inWish?'❤️ Remove from Wishlist':'🤍 Add to Wishlist'}</button>
-      <button class="pm-wish-btn" style="margin-top:8px;border-color:rgba(22,163,74,.3);color:var(--green)" onclick="enquireProduct(null,'${p.name}','${p.price}')">
+      <button class="pm-wish-btn" style="margin-top:8px;border-color:rgba(22,163,74,.3);color:var(--green)" onclick="enquireProduct(null,'${p.name}','${displayPrice}')">
         💬 Enquire on WhatsApp
       </button>
-    </div>`;
+      <button class="pm-share-btn" onclick="shareProduct('${id}')">📤 Share this Product</button>
+    </div>
+    ${youMayLike}`;
   document.getElementById('modal-wrap').classList.add('open');
 };
 
@@ -2016,6 +2188,144 @@ window.enquireProduct = function(e, name, price){
   document.getElementById('bp-lusaka').addEventListener('click',()=>{ window.open('https://wa.me/260971790061?text='+encodeURIComponent(msgText),'_blank'); sheet.remove(); });
   document.getElementById('bp-cancel').addEventListener('click',()=>sheet.remove());
 };
+
+/* ════ GALLERY NAVIGATION ════ */
+let _galIdx = 0;
+let _galTotal = 0;
+let _galTouchX = 0;
+
+window.galGoTo = function(i){
+  const track = document.getElementById('gal-track');
+  if(!track) return;
+  _galTotal = track.children.length;
+  _galIdx = Math.max(0, Math.min(i, _galTotal-1));
+  track.style.transform = `translateX(-${_galIdx*100}%)`;
+  document.querySelectorAll('.gal-dot').forEach((d,j)=>d.classList.toggle('active',j===_galIdx));
+  const cnt = document.getElementById('gal-count');
+  if(cnt) cnt.textContent = `${_galIdx+1} / ${_galTotal}`;
+};
+
+window.galStep = function(dir){ galGoTo(_galIdx + dir); };
+
+document.addEventListener('touchstart', e=>{
+  if(e.target.closest('.pm-img')) _galTouchX = e.touches[0].clientX;
+},{passive:true});
+
+document.addEventListener('touchend', e=>{
+  if(e.target.closest('.pm-img')){
+    const dx = e.changedTouches[0].clientX - _galTouchX;
+    if(Math.abs(dx)>40) galStep(dx<0?1:-1);
+  }
+},{passive:true});
+
+/* ════ SHARE PRODUCT ════ */
+window.shareProduct = function(id){
+  const p = PRODUCTS.find(x=>x._id===id);
+  if(!p) return;
+  const saleActive = p.onSale && p.salePrice && (!p.saleUntil || new Date(p.saleUntil) > new Date());
+  const price = saleActive ? p.salePrice : p.price;
+  const url = window.location.href.split('#')[0];
+  const msg = `🛍️ *${p.name}*\n💰 K${price}${saleActive?` ~~K${p.price}~~ (SALE!)`:''}\n\n${p.desc?p.desc+'\n\n':''}Shop at *Shade's Apparel* 👗\n📍 Katunjila, Lusaka\n🔗 ${url}`;
+  if(navigator.share){
+    navigator.share({title:`${p.name} — Shade's Apparel`, text:msg, url}).catch(()=>{});
+  } else {
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+  }
+};
+
+/* ════ SIZE GUIDE ════ */
+const SIZE_GUIDE = {
+  women: {headers:['Size','Chest (cm)','Waist (cm)','Hips (cm)'],rows:[['XS','76-80','60-64','84-88'],['S','82-86','66-70','90-94'],['M','88-92','72-76','96-100'],['L','94-100','78-84','102-108'],['XL','102-108','86-92','110-116'],['XXL','110-116','94-100','118-124']]},
+  men:   {headers:['Size','Chest (cm)','Waist (cm)','Shoulder (cm)'],rows:[['S','88-92','74-78','43'],['M','94-98','80-84','45'],['L','100-104','86-90','47'],['XL','106-110','92-96','49'],['XXL','112-118','98-104','51']]},
+  kids:  {headers:['Age','Height (cm)','Chest (cm)','Waist (cm)'],rows:[['2-3yr','92-98','54','51'],['4-5yr','104-110','57','53'],['6-7yr','116-122','61','55'],['8-9yr','128-134','65','57'],['10-12yr','140-152','70','60']]},
+  shoes: {headers:['EU','UK','US','Foot (cm)'],rows:[['36','3.5','5.5','22.5'],['37','4','6','23'],['38','5','7','24'],['39','6','7.5','24.5'],['40','6.5','8','25'],['41','7','8.5','25.5'],['42','8','9','26'],['43','9','10','27'],['44','9.5','10.5','27.5'],['45','10','11','28']]}
+};
+window.showSizeGuide = function(cat){
+  const guide = SIZE_GUIDE[cat];
+  if(!guide) return;
+  const existing = document.getElementById('sg-modal');
+  if(existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'sg-modal';
+  modal.className = 'sg-modal';
+  modal.innerHTML = `
+    <div class="sg-sheet">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:16px;font-weight:900">📏 Size Guide — ${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>
+        <button onclick="document.getElementById('sg-modal').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:4px">Measurements are approximate. When in doubt, size up.</p>
+      <table class="sg-table">
+        <thead><tr>${guide.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${guide.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+  modal.addEventListener('click', e=>{ if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+};
+
+/* ════ SALE TOGGLE ════ */
+window.toggleSaleFields = function(prefix){
+  const on = document.getElementById(`${prefix}-on-sale`).checked;
+  document.getElementById(`${prefix}-sale-fields`).style.display = on ? 'block' : 'none';
+};
+
+/* ════ SALES DASHBOARD ════ */
+function renderDashboard(){
+  const el = document.getElementById('dash-content');
+  if(!el) return;
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime()/1000;
+  const weekStart  = todayStart - 6*86400;
+  const monthStart = new Date(now.getFullYear(),now.getMonth(),1).getTime()/1000;
+  const delivered  = ORDERS.filter(o=>o.status==='delivered');
+  const rev = (from) => delivered.filter(o=>(o.createdAt?.seconds||0)>=from).reduce((s,o)=>s+(o.total||0),0);
+  const todayRev = rev(todayStart);
+  const weekRev  = rev(weekStart);
+  const monthRev = rev(monthStart);
+  const allRev   = delivered.reduce((s,o)=>s+(o.total||0),0);
+  // Status counts (non-archived)
+  const live = ORDERS.filter(o=>!o.archived);
+  const statusCounts = {};
+  ['pending','confirmed','packing','dispatched','delivered'].forEach(s=>{ statusCounts[s]=live.filter(o=>o.status===s).length; });
+  // Top products
+  const productSales = {};
+  ORDERS.filter(o=>!o.archived).forEach(o=>{
+    (o.items||[]).forEach(it=>{
+      if(!productSales[it.name]) productSales[it.name]={qty:0,rev:0};
+      productSales[it.name].qty += it.qty||1;
+      productSales[it.name].rev += (it.qty||1)*(it.price||0);
+    });
+  });
+  const topProducts = Object.entries(productSales).sort((a,b)=>b[1].qty-a[1].qty).slice(0,5);
+  el.innerHTML = `
+    <div style="padding:4px 0 16px">
+      <div class="dash-grid">
+        <div class="dash-card"><div class="dash-val">K${todayRev.toFixed(0)}</div><div class="dash-lbl">Today</div></div>
+        <div class="dash-card"><div class="dash-val">K${weekRev.toFixed(0)}</div><div class="dash-lbl">This Week</div></div>
+        <div class="dash-card"><div class="dash-val">K${monthRev.toFixed(0)}</div><div class="dash-lbl">This Month</div></div>
+        <div class="dash-card"><div class="dash-val">K${allRev.toFixed(0)}</div><div class="dash-lbl">All Time</div></div>
+      </div>
+      <div class="dash-section-ttl">📦 Orders by Status</div>
+      <div class="dash-status-row">
+        <div class="dash-s-pill"><div class="dash-s-val" style="color:#f59e0b">${statusCounts.pending}</div><div class="dash-s-lbl">Pending</div></div>
+        <div class="dash-s-pill"><div class="dash-s-val" style="color:var(--green)">${statusCounts.confirmed}</div><div class="dash-s-lbl">Confirmed</div></div>
+        <div class="dash-s-pill"><div class="dash-s-val" style="color:#3b82f6">${statusCounts.packing}</div><div class="dash-s-lbl">Packing</div></div>
+        <div class="dash-s-pill"><div class="dash-s-val" style="color:#8b5cf6">${statusCounts.dispatched}</div><div class="dash-s-lbl">On Way</div></div>
+        <div class="dash-s-pill"><div class="dash-s-val" style="color:var(--red)">${statusCounts.delivered}</div><div class="dash-s-lbl">Done</div></div>
+      </div>
+      <div class="dash-section-ttl">🏆 Top Selling Products</div>
+      ${topProducts.length
+        ? topProducts.map(([name,d],i)=>`
+          <div class="dash-top-item">
+            <span style="color:var(--muted);font-size:12px;font-weight:800;width:18px">#${i+1}</span>
+            <span class="dash-top-name">${name}</span>
+            <span class="dash-top-count">${d.qty} sold</span>
+            <span class="dash-top-rev">K${d.rev.toFixed(0)}</span>
+          </div>`).join('')
+        : '<div class="ao-empty">No order data yet</div>'}
+    </div>`;
+}
 
 /* ════ TOAST ════ */
 window.toast = function(msg){
@@ -2152,11 +2462,12 @@ window.changePin = async function(){
 
 /* ════ ADMIN TABS ════ */
 window.admTab = function(tab){
-  ['products','orders','settings'].forEach(t=>{
+  ['products','orders','dashboard','settings'].forEach(t=>{
     document.getElementById('tab-'+t).style.display = t===tab?'block':'none';
-    document.getElementById('tab-btn-'+t).classList.toggle('active',t===tab);
+    document.getElementById('tab-btn-'+t)?.classList.toggle('active',t===tab);
   });
   if(tab==='orders') renderAdmOrders();
+  if(tab==='dashboard') renderDashboard();
 };
 
 /* ════ ADMIN PRODUCTS ════ */
@@ -2166,40 +2477,114 @@ function renderAdmList(){
   if(!el) return;
   cnt.textContent = `${PRODUCTS.length} product${PRODUCTS.length!==1?'s':''} in store`;
   if(!PRODUCTS.length){ el.innerHTML='<div class="ao-empty">No products yet. Add your first product above.</div>'; return; }
-  el.innerHTML = PRODUCTS.map(p=>`
+  el.innerHTML = PRODUCTS.map(p=>{
+    const stockTag = p.stock!==null&&p.stock!==undefined
+      ? (p.stock<=0?`<span class="out-stock-tag">OUT OF STOCK</span>`
+        :(p.stock<=5?`<span class="low-stock-tag">⚠️ Low: ${p.stock} left</span>`:`<span style="font-size:10px;color:var(--green);font-weight:700;margin-left:6px">${p.stock} in stock</span>`))
+      : '';
+    const saleTag = p.onSale&&p.salePrice?`<span style="background:#fee2e2;color:var(--red);font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;margin-left:6px">🏷️ SALE K${p.salePrice}</span>`:'';
+    return `
     <div class="adm-pitem">
       <div class="ap-img">${p.image?`<img src="${p.image}">`:(p.icon||'🛍️')}</div>
       <div class="ap-info">
         <div class="ap-name">${p.name}</div>
-        <div class="ap-meta">${getCat(p)} ${p.badge?'· '+p.badge:''} ${p.featured?'· ⭐':''}</div>
+        <div class="ap-meta">${getCat(p)} ${p.badge?'· '+p.badge:''} ${p.featured?'· ⭐':''}${stockTag}${saleTag}</div>
         <div class="ap-price">K${p.price}${p.bundleQty&&p.bundlePrice?` <span style="color:#ff6b00;font-size:10px;font-weight:700">· 🔥${p.bundleQty} for K${p.bundlePrice}</span>`:''}</div>
       </div>
       <div class="ap-actions">
         <button class="ap-btn edit" onclick="openEditPanel('${p._id}')">✏️</button>
         <button class="ap-btn del" onclick="admDelete('${p._id}')">🗑️</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-window.previewAddImg = function(input){
-  const prev = document.getElementById('ap-img-preview');
-  const lbl  = document.getElementById('ap-img-label');
+/* ════ MULTI-IMAGE UPLOAD ════ */
+let addImgFiles   = []; // File objects for add form (up to 5)
+let editImgUrls   = []; // existing Cloudinary URLs in edit form
+let editImgFiles  = []; // new File objects added in edit form (parallel array to slots)
+
+const MAX_PHOTOS = 5;
+
+function renderAddSlots(){
+  const grid = document.getElementById('ap-img-grid');
+  if(!grid) return;
+  let html = '';
+  for(let i=0;i<MAX_PHOTOS;i++){
+    const f = addImgFiles[i];
+    const preview = f ? URL.createObjectURL(f) : null;
+    if(preview){
+      html += `<div class="img-slot filled">
+        <img src="${preview}" id="ap-slot-img-${i}">
+        <button class="img-slot-del" onclick="removeAddSlot(${i})">✕</button>
+        ${i===0?`<div style="position:absolute;bottom:4px;left:4px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 5px;border-radius:3px">MAIN</div>`:''}
+      </div>`;
+    } else if(i <= addImgFiles.length){
+      html += `<div class="img-slot" onclick="document.getElementById('ap-file-${i}').click()">
+        <input type="file" accept="image/*" id="ap-file-${i}" style="display:none" onchange="addImgSlotChange(this,${i})">
+        <div style="text-align:center"><div class="img-slot-ico">📷</div><div class="img-slot-lbl">${i===0?'Main':'Photo '+(i+1)}</div></div>
+      </div>`;
+      break;
+    }
+  }
+  grid.innerHTML = html;
+}
+
+window.addImgSlotChange = function(input, i){
   if(input.files&&input.files[0]){
-    const r = new FileReader();
-    r.onload = e=>{ prev.src=e.target.result; prev.style.display='block'; lbl.style.display='none'; };
-    r.readAsDataURL(input.files[0]);
+    addImgFiles[i] = input.files[0];
+    renderAddSlots();
   }
 };
 
-window.previewEditImg = function(input){
-  const prev = document.getElementById('ep-img-preview');
-  const lbl  = document.getElementById('ep-img-label');
+window.removeAddSlot = function(i){
+  addImgFiles.splice(i,1);
+  renderAddSlots();
+};
+
+function renderEditSlots(){
+  const grid = document.getElementById('ep-img-grid');
+  if(!grid) return;
+  let html = '';
+  // existing uploaded URLs
+  editImgUrls.forEach((url,i)=>{
+    html += `<div class="img-slot filled">
+      <img src="${url}">
+      <button class="img-slot-del" onclick="removeEditUrl(${i})">✕</button>
+      ${i===0?`<div style="position:absolute;bottom:4px;left:4px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 5px;border-radius:3px">MAIN</div>`:''}
+    </div>`;
+  });
+  // new file slots
+  editImgFiles.forEach((f,i)=>{
+    if(f){
+      html += `<div class="img-slot filled">
+        <img src="${URL.createObjectURL(f)}">
+        <button class="img-slot-del" onclick="removeEditFile(${i})">✕</button>
+      </div>`;
+    }
+  });
+  const totalFilled = editImgUrls.length + editImgFiles.filter(Boolean).length;
+  if(totalFilled < MAX_PHOTOS){
+    const ni = editImgFiles.length;
+    html += `<div class="img-slot" onclick="document.getElementById('ep-file-new-${ni}').click()">
+      <input type="file" accept="image/*" id="ep-file-new-${ni}" style="display:none" onchange="addEditFileSlot(this)">
+      <div style="text-align:center"><div class="img-slot-ico">➕</div><div class="img-slot-lbl">Add Photo</div></div>
+    </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+window.addEditFileSlot = function(input){
   if(input.files&&input.files[0]){
-    const r = new FileReader();
-    r.onload = e=>{ prev.src=e.target.result; prev.style.display='block'; lbl.style.display='none'; };
-    r.readAsDataURL(input.files[0]);
+    editImgFiles.push(input.files[0]);
+    renderEditSlots();
   }
 };
+window.removeEditUrl = function(i){ editImgUrls.splice(i,1); renderEditSlots(); };
+window.removeEditFile = function(i){ editImgFiles.splice(i,1); renderEditSlots(); };
+
+// init add slots on page load
+renderAddSlots();
 
 async function uploadImage(file){
   const fd = new FormData();
@@ -2216,9 +2601,13 @@ window.admAddProduct = async function(){
   if(!name||!price){ toast('⚠️ Name and price are required'); return; }
   const btn = document.getElementById('ap-submit');
   btn.disabled=true; btn.textContent='Adding...';
-  let imageUrl = null;
-  const file = document.getElementById('ap-img-file').files[0];
-  if(file) imageUrl = await uploadImage(file);
+  // Upload all photos
+  const imageUrls = [];
+  for(const file of addImgFiles.filter(Boolean)){
+    const url = await uploadImage(file);
+    if(url) imageUrls.push(url);
+  }
+  const mainImage = imageUrls[0] || null;
   const cat = document.getElementById('ap-category').value;
   try {
     await addDoc(collection(db, COLL), {
@@ -2231,20 +2620,26 @@ window.admAddProduct = async function(){
       sizes:      document.getElementById('ap-sizes').value,
       desc:       document.getElementById('ap-desc').value,
       featured:   document.getElementById('ap-featured').checked,
-      image:      imageUrl,
+      image:      mainImage,
+      images:     imageUrls,
       bundleQty:  parseInt(document.getElementById('ap-bundle-qty').value)||null,
       bundlePrice:parseFloat(document.getElementById('ap-bundle-price').value)||null,
       subcategory:document.getElementById('ap-subcat').value.trim()||null,
+      stock:      document.getElementById('ap-stock').value!==''?parseInt(document.getElementById('ap-stock').value):null,
+      onSale:     document.getElementById('ap-on-sale').checked,
+      salePrice:  parseFloat(document.getElementById('ap-sale-price').value)||null,
+      saleUntil:  document.getElementById('ap-sale-until').value||null,
       createdAt:  serverTimestamp()
     });
     toast('✅ Product added!');
-    ['ap-name','ap-price','ap-old','ap-icon','ap-sizes','ap-desc','ap-bundle-qty','ap-bundle-price','ap-badge','ap-subcat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['ap-name','ap-price','ap-old','ap-icon','ap-sizes','ap-desc','ap-bundle-qty','ap-bundle-price','ap-badge','ap-subcat','ap-stock','ap-sale-price','ap-sale-until'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     document.getElementById('ap-category').value='women';
     document.getElementById('ap-featured').checked=false;
+    document.getElementById('ap-on-sale').checked=false;
+    document.getElementById('ap-sale-fields').style.display='none';
+    addImgFiles = [];
+    renderAddSlots();
     updateSubcatOptions('ap');
-    document.getElementById('ap-img-preview').style.display='none';
-    document.getElementById('ap-img-label').style.display='block';
-    document.getElementById('ap-img-file').value='';
   } catch(err){ toast('❌ Error: '+err.message); }
   btn.disabled=false; btn.textContent='✅ Add Product';
 };
@@ -2265,6 +2660,15 @@ window.openEditPanel = function(id){
   document.getElementById('ep-bundle-qty').value=p.bundleQty||'';
   document.getElementById('ep-bundle-price').value=p.bundlePrice||'';
   updateSubcatOptions('ep', p.subcategory||'');
+  document.getElementById('ep-stock').value = p.stock!==null&&p.stock!==undefined ? p.stock : '';
+  document.getElementById('ep-on-sale').checked = !!p.onSale;
+  document.getElementById('ep-sale-price').value = p.salePrice||'';
+  document.getElementById('ep-sale-until').value = p.saleUntil||'';
+  document.getElementById('ep-sale-fields').style.display = p.onSale ? 'block' : 'none';
+  // Load images into grid
+  editImgUrls  = p.images?.length ? [...p.images] : (p.image ? [p.image] : []);
+  editImgFiles = [];
+  renderEditSlots();
   if(p.image){ document.getElementById('ep-img-preview').src=p.image; document.getElementById('ep-img-preview').style.display='block'; document.getElementById('ep-img-label').style.display='none'; }
   else { document.getElementById('ep-img-preview').style.display='none'; document.getElementById('ep-img-label').style.display='block'; }
   const panel = document.getElementById('edit-panel');
@@ -2281,9 +2685,14 @@ window.admSaveEdit = async function(){
   if(!id||!name||!price){ toast('⚠️ Fill required fields'); return; }
   const btn = document.getElementById('ep-submit');
   btn.disabled=true; btn.textContent='Saving...';
-  let imageUrl = PRODUCTS.find(x=>x._id===id)?.image||null;
-  const file = document.getElementById('ep-img-file').files[0];
-  if(file) imageUrl = await uploadImage(file);
+  // Upload any new images and merge with existing URLs
+  const newUrls = [];
+  for(const file of editImgFiles.filter(Boolean)){
+    const url = await uploadImage(file);
+    if(url) newUrls.push(url);
+  }
+  const allImages = [...editImgUrls, ...newUrls];
+  const mainImage = allImages[0] || null;
   const cat = document.getElementById('ep-category').value;
   try {
     await updateDoc(doc(db,COLL,id),{
@@ -2296,10 +2705,15 @@ window.admSaveEdit = async function(){
       sizes:      document.getElementById('ep-sizes').value,
       desc:       document.getElementById('ep-desc').value,
       featured:   document.getElementById('ep-featured').checked,
-      image:      imageUrl,
+      image:      mainImage,
+      images:     allImages,
       bundleQty:  parseInt(document.getElementById('ep-bundle-qty').value)||null,
       bundlePrice:parseFloat(document.getElementById('ep-bundle-price').value)||null,
-      subcategory:document.getElementById('ep-subcat').value.trim()||null
+      subcategory:document.getElementById('ep-subcat').value.trim()||null,
+      stock:      document.getElementById('ep-stock').value!==''?parseInt(document.getElementById('ep-stock').value):null,
+      onSale:     document.getElementById('ep-on-sale').checked,
+      salePrice:  parseFloat(document.getElementById('ep-sale-price').value)||null,
+      saleUntil:  document.getElementById('ep-sale-until').value||null,
     });
     toast('✅ Product updated!');
     closeEditPanel();
