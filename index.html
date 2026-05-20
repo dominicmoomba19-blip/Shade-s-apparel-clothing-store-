@@ -1775,6 +1775,14 @@ window.go = function(sec, fromPop) {
 };
 
 window.addEventListener('popstate', function(e){
+  // If modal is open, close it and stay on current section
+  const modal = document.getElementById('modal-wrap');
+  if(modal && modal.classList.contains('open')){
+    modal.classList.remove('open');
+    // Restore the state so back works correctly next press
+    history.pushState({sec: currentSec}, '', '#'+currentSec);
+    return;
+  }
   const sec = e.state?.sec || 'home';
   go(sec, true);
 });
@@ -1970,6 +1978,7 @@ function showCheckoutForm(){
       <button class="af-submit" onclick="submitOrder()">✅ Place Order via WhatsApp</button>
     </div>`;
   document.getElementById('modal-wrap').classList.add('open');
+  history.pushState({sec: currentSec, modal: true}, '', '#modal');
 }
 
 let _submittingOrder = false;
@@ -2142,13 +2151,14 @@ window.openModal = function(id){
         ${outOfStock?'❌ Out of Stock':(inCart?'✓ Added to Cart':'🛒 Add to Cart')}
       </button>
       <button class="pm-wish-btn" onclick="toggleWish(null,'${id}')">${inWish?'❤️ Remove from Wishlist':'🤍 Add to Wishlist'}</button>
-      <button class="pm-wish-btn" style="margin-top:8px;border-color:rgba(22,163,74,.3);color:var(--green)" onclick="enquireProduct(null,'${p.name}','${displayPrice}')">
+      <button class="pm-wish-btn" style="margin-top:8px;border-color:rgba(22,163,74,.3);color:var(--green)" onclick="enquireProduct(null,'${p.name}','${displayPrice}','${id}','${p.bundlePrice||''}','${p.bundleQty||''}')">
         💬 Enquire on WhatsApp
       </button>
       <button class="pm-share-btn" onclick="shareProduct('${id}')">📤 Share this Product</button>
     </div>
     ${youMayLike}`;
   document.getElementById('modal-wrap').classList.add('open');
+  history.pushState({sec: currentSec, modal: true}, '', '#modal');
 };
 
 window.selSize = function(btn){
@@ -2215,11 +2225,17 @@ function renderWishlist(){
 }
 
 /* ════ ENQUIRE ════ */
-window.enquireProduct = function(e, name, price){
+window.enquireProduct = function(e, name, price, productId, bundlePrice, bundleQty){
   if(e) e.stopPropagation();
   const old = document.getElementById('branch-picker');
   if(old) old.remove();
-  const msgText = `Hi Shade's Apparel! 👋\n\nI'm interested in *${name}* (K${price}).\n\nPlease send me more details. Thank you!`;
+  // Check if user has the bundle option selected right now
+  const bundleActive = productId && document.getElementById('bopt-bundle')?.classList.contains('active');
+  const finalPrice = bundleActive && bundlePrice ? bundlePrice : price;
+  const itemDesc = bundleActive && bundleQty
+    ? `*${name}* — 🔥 Bundle Deal (${bundleQty} items for K${finalPrice})`
+    : `*${name}* (K${finalPrice})`;
+  const msgText = `Hi Shade's Apparel! 👋\n\nI'm interested in ${itemDesc}.\n\nPlease send me more details. Thank you!`;
   const sheet = document.createElement('div');
   sheet.id = 'branch-picker';
   sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(4px)';
