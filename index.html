@@ -1550,7 +1550,7 @@ function renderCatGrid(){
   const grid = document.getElementById('cat-tile-grid');
   if(!grid) return;
   const tiles = Object.entries(CAT_META).map(([key, meta])=>{
-    const prods = PRODUCTS.filter(p=>getCat(p)===key);
+    const prods = PRODUCTS.filter(p=>getCat(p)===key && !p.hidden);
     if(!prods.length) return '';
     const img = prods.find(p=>p.image)?.image || null;
     const count = prods.length;
@@ -1582,7 +1582,7 @@ let _selectedCat = null, _selectedSub = null;
 
 window.openCatSubs = function(catKey){
   const meta = CAT_META[catKey] || {label:catKey, icon:'🛍️'};
-  const prods = PRODUCTS.filter(p=>getCat(p)===catKey);
+  const prods = PRODUCTS.filter(p=>getCat(p)===catKey && !p.hidden);
   const subs = [...new Set(prods.filter(p=>p.subcategory).map(p=>p.subcategory.trim()))].sort();
   _selectedCat = catKey; _selectedSub = null;
   if(!subs.length){
@@ -1627,7 +1627,7 @@ function renderSubFilterBar(catKey, activeSub){
   const bar = document.getElementById('sub-filter-bar');
   if(!bar) return;
   if(!catKey){ bar.classList.remove('show'); bar.innerHTML=''; return; }
-  const prods = PRODUCTS.filter(p=>getCat(p)===catKey);
+  const prods = PRODUCTS.filter(p=>getCat(p)===catKey && !p.hidden);
   const subs = [...new Set(prods.filter(p=>p.subcategory).map(p=>p.subcategory.trim()))].sort();
   if(!subs.length){ bar.classList.remove('show'); bar.innerHTML=''; return; }
   const meta = CAT_META[catKey] || {label:catKey};
@@ -1668,10 +1668,10 @@ function startOrdersListener(){
   _ordersUnsub = onSnapshot(collection(db, ORDERS_COLL), async snap => {
     const newOrders = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
     ORDERS = newOrders;
-    // Auto-delete orders delivered 30+ days ago
+    // Auto-delete orders that are ARCHIVED and delivered 30+ days ago
     const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
     const expired = newOrders.filter(o =>
-      o.status === 'delivered' && o.createdAt?.seconds && (o.createdAt.seconds * 1000) < thirtyDaysAgo
+      o.archived && o.status === 'delivered' && o.createdAt?.seconds && (o.createdAt.seconds * 1000) < thirtyDaysAgo
     );
     if(expired.length){
       await Promise.all(expired.map(o => deleteDoc(doc(db, ORDERS_COLL, o._id))));
@@ -1794,7 +1794,7 @@ window.doFilter = function(){
   const cat   = document.getElementById('cat-filter')?.value || '';
   const badge = document.getElementById('badge-filter')?.value || '';
   const q     = (document.getElementById('shop-search')?.value || '').toLowerCase();
-  let items = [...PRODUCTS];
+  let items = PRODUCTS.filter(p => !p.hidden);
   if(cat)   items = items.filter(p=>getCat(p)===cat);
   if(_selectedSub && _selectedCat===cat) items = items.filter(p=>p.subcategory?.trim()===_selectedSub);
   if(badge) items = items.filter(p=>p.badge===badge);
@@ -2090,7 +2090,7 @@ window.openModal = function(id){
       <span>${p.icon||'🛍️'}</span>`;
   }
   // You may also like
-  const related = PRODUCTS.filter(x=>x._id!==id && getCat(x)===cat).slice(0,6);
+  const related = PRODUCTS.filter(x=>x._id!==id && getCat(x)===cat && !x.hidden).slice(0,6);
   const youMayLike = related.length ? `
     <div class="you-like-wrap">
       <div class="you-like-ttl">You may also like</div>
