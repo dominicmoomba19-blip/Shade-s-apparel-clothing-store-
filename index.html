@@ -1937,7 +1937,10 @@ function showCheckoutForm(){
   document.getElementById('pm-content').innerHTML = `
     <div style="padding:20px">
       <div class="pm-handle" style="margin:0 auto 16px"></div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:var(--ink);margin-bottom:16px">📦 Checkout Details</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <button onclick="document.getElementById('modal-wrap').classList.remove('open');history.back()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);padding:0;line-height:1;flex-shrink:0">←</button>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:var(--ink)">📦 Checkout Details</div>
+      </div>
       <div class="af-grp"><label>Full Name *</label><input id="co-name" placeholder="Your full name"></div>
       <div class="af-grp"><label>Phone Number *</label><input id="co-phone" type="tel" placeholder="0976 123 456" inputmode="tel"></div>
       <div class="af-grp" style="margin-bottom:12px">
