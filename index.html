@@ -1100,7 +1100,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
         <h3>📦 Track Delivery</h3>
         <p>Enter your order number to check your delivery status</p>
         <div class="track-input-row">
-          <input class="track-input" id="track-input" placeholder="e.g. BI-A1B2" oninput="this.value=this.value.toUpperCase()">
+          <input class="track-input" id="track-input" placeholder="e.g. SA-M5X2AB" oninput="this.value=this.value.toUpperCase()">
           <button class="track-btn" onclick="trackOrder()">Track</button>
         </div>
       </div>
@@ -1474,7 +1474,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, getDoc, setDoc, serverTimestamp, query, where, getDocs }
+import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, getDoc, setDoc, serverTimestamp, query, where, getDocs, runTransaction, increment }
   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 /* ══ FIREBASE CONFIG ══ */
@@ -2000,23 +2000,52 @@ window.submitOrder = async function(){
     if(btn){ btn.disabled=false; btn.textContent='✅ Place Order via WhatsApp'; }
     _submittingOrder=false; return;
   }
-  const orderNum = 'BI-' + Date.now().toString(36).toUpperCase().slice(-4) + Math.floor(100+Math.random()*900);
+  const orderNum = 'SA-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2,6).toUpperCase();
   const subtotal = cartSubtotal();
   const delivery = 0;
   try {
-    await addDoc(collection(db, ORDERS_COLL), {
-      orderNum, customerName:name, phone, address, area, town, notes, payment,
-      branch: branchKey, branchLabel: branch.label,
-      items: cart.map(c=>({
-        name: c.bundleActive ? `${c.name} (Bundle ×${c.bundleQty})` : c.name,
-        price: c.bundleActive ? c.bundlePrice : c.price,
-        qty: c.qty||1
-      })),
-      subtotal, delivery, total:subtotal+delivery,
-      status:'pending', archived:false, createdAt: serverTimestamp()
+    // Atomically check stock and create order in one transaction
+    // so 500 concurrent orders cannot oversell the same item
+    await runTransaction(db, async (txn) => {
+      // 1. Check stock for every item that tracks it
+      for (const item of cart) {
+        const baseId = item.bundleActive ? item._id.replace('_bundle','') : item._id;
+        const prodRef = doc(db, COLL, baseId);
+        const prodSnap = await txn.get(prodRef);
+        if (!prodSnap.exists()) throw new Error(`"${item.name}" no longer exists`);
+        const { stock } = prodSnap.data();
+        const qtyNeeded = item.bundleActive ? (item.bundleQty * (item.qty||1)) : (item.qty||1);
+        if (stock !== null && stock !== undefined && stock < qtyNeeded) {
+          throw new Error(`"${item.name}" is out of stock — only ${stock} left`);
+        }
+      }
+      // 2. Decrement stock for items that track it
+      for (const item of cart) {
+        const baseId = item.bundleActive ? item._id.replace('_bundle','') : item._id;
+        const prodRef = doc(db, COLL, baseId);
+        const prodSnap = await txn.get(prodRef);
+        const { stock } = prodSnap.data();
+        const qtyNeeded = item.bundleActive ? (item.bundleQty * (item.qty||1)) : (item.qty||1);
+        if (stock !== null && stock !== undefined) {
+          txn.update(prodRef, { stock: increment(-qtyNeeded) });
+        }
+      }
+      // 3. Create the order document
+      const newOrderRef = doc(collection(db, ORDERS_COLL));
+      txn.set(newOrderRef, {
+        orderNum, customerName:name, phone, address, area, town, notes, payment,
+        branch: branchKey, branchLabel: branch.label,
+        items: cart.map(c=>({
+          name: c.bundleActive ? `${c.name} (Bundle ×${c.bundleQty})` : c.name,
+          price: c.bundleActive ? c.bundlePrice : c.price,
+          qty: c.qty||1
+        })),
+        subtotal, delivery, total:subtotal+delivery,
+        status:'pending', archived:false, createdAt: serverTimestamp()
+      });
     });
   } catch(err){
-    toast('⚠️ Could not save order: '+err.message);
+    toast('⚠️ ' + (err.message || 'Could not place order'));
     if(btn){ btn.disabled=false; btn.textContent='✅ Place Order via WhatsApp'; }
     _submittingOrder=false; return;
   }
