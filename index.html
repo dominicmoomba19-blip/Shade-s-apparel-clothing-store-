@@ -7,6 +7,8 @@
 <meta property="og:title" content="Shade's Apparel Katunjila">
 <meta property="og:description" content="Lusaka's trending fashion store — women, men & kids clothing. Katunjila Road 120, Lusaka.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://res.cloudinary.com/dxxiujvrw/image/upload/v1779069526/1779068458081_szq8nk.jpg">
+<meta property="og:url" content="https://shadesapparel.co.zm"><!-- ← update to your actual deployed URL -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👗</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -1550,7 +1552,7 @@ function renderCatGrid(){
   const grid = document.getElementById('cat-tile-grid');
   if(!grid) return;
   const tiles = Object.entries(CAT_META).map(([key, meta])=>{
-    const prods = PRODUCTS.filter(p=>getCat(p)===key && !p.hidden);
+    const prods = PRODUCTS.filter(p=>getCat(p)===key);
     if(!prods.length) return '';
     const img = prods.find(p=>p.image)?.image || null;
     const count = prods.length;
@@ -1582,7 +1584,7 @@ let _selectedCat = null, _selectedSub = null;
 
 window.openCatSubs = function(catKey){
   const meta = CAT_META[catKey] || {label:catKey, icon:'🛍️'};
-  const prods = PRODUCTS.filter(p=>getCat(p)===catKey && !p.hidden);
+  const prods = PRODUCTS.filter(p=>getCat(p)===catKey);
   const subs = [...new Set(prods.filter(p=>p.subcategory).map(p=>p.subcategory.trim()))].sort();
   _selectedCat = catKey; _selectedSub = null;
   if(!subs.length){
@@ -1627,7 +1629,7 @@ function renderSubFilterBar(catKey, activeSub){
   const bar = document.getElementById('sub-filter-bar');
   if(!bar) return;
   if(!catKey){ bar.classList.remove('show'); bar.innerHTML=''; return; }
-  const prods = PRODUCTS.filter(p=>getCat(p)===catKey && !p.hidden);
+  const prods = PRODUCTS.filter(p=>getCat(p)===catKey);
   const subs = [...new Set(prods.filter(p=>p.subcategory).map(p=>p.subcategory.trim()))].sort();
   if(!subs.length){ bar.classList.remove('show'); bar.innerHTML=''; return; }
   const meta = CAT_META[catKey] || {label:catKey};
@@ -1668,10 +1670,10 @@ function startOrdersListener(){
   _ordersUnsub = onSnapshot(collection(db, ORDERS_COLL), async snap => {
     const newOrders = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
     ORDERS = newOrders;
-    // Auto-delete orders that are ARCHIVED and delivered 30+ days ago
+    // Auto-delete orders delivered 30+ days ago
     const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
     const expired = newOrders.filter(o =>
-      o.archived && o.status === 'delivered' && o.createdAt?.seconds && (o.createdAt.seconds * 1000) < thirtyDaysAgo
+      o.status === 'delivered' && o.createdAt?.seconds && (o.createdAt.seconds * 1000) < thirtyDaysAgo
     );
     if(expired.length){
       await Promise.all(expired.map(o => deleteDoc(doc(db, ORDERS_COLL, o._id))));
@@ -1745,7 +1747,7 @@ function loadSec(sec) {
     case 'kids':     render('kids-grid',  all.filter(p=>getCat(p)==='kids')); break;
     case 'shoes':    render('shoes-grid', all.filter(p=>getCat(p)==='shoes')); break;
     case 'bags':     render('bags-grid',  all.filter(p=>getCat(p)==='bags')); break;
-    case 'sale':     render('sale-grid',  all.filter(p=>p.badge==='sale')); break;
+    case 'sale':     render('sale-grid',  all.filter(p=>p.badge==='sale' || (p.onSale && p.salePrice && (!p.saleUntil || new Date(p.saleUntil) > new Date())))); break;
     case 'wishlist': renderWishlist();    break;
   }
 }
@@ -1775,14 +1777,6 @@ window.go = function(sec, fromPop) {
 };
 
 window.addEventListener('popstate', function(e){
-  // If modal is open, close it and stay on current section
-  const modal = document.getElementById('modal-wrap');
-  if(modal && modal.classList.contains('open')){
-    modal.classList.remove('open');
-    // Restore the state so back works correctly next press
-    history.pushState({sec: currentSec}, '', '#'+currentSec);
-    return;
-  }
   const sec = e.state?.sec || 'home';
   go(sec, true);
 });
@@ -1802,7 +1796,7 @@ window.doFilter = function(){
   const cat   = document.getElementById('cat-filter')?.value || '';
   const badge = document.getElementById('badge-filter')?.value || '';
   const q     = (document.getElementById('shop-search')?.value || '').toLowerCase();
-  let items = PRODUCTS.filter(p => !p.hidden);
+  let items = [...PRODUCTS];
   if(cat)   items = items.filter(p=>getCat(p)===cat);
   if(_selectedSub && _selectedCat===cat) items = items.filter(p=>p.subcategory?.trim()===_selectedSub);
   if(badge) items = items.filter(p=>p.badge===badge);
@@ -1937,10 +1931,7 @@ function showCheckoutForm(){
   document.getElementById('pm-content').innerHTML = `
     <div style="padding:20px">
       <div class="pm-handle" style="margin:0 auto 16px"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <button onclick="document.getElementById('modal-wrap').classList.remove('open');history.back()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);padding:0;line-height:1;flex-shrink:0">←</button>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:var(--ink)">📦 Checkout Details</div>
-      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:var(--ink);margin-bottom:16px">📦 Checkout Details</div>
       <div class="af-grp"><label>Full Name *</label><input id="co-name" placeholder="Your full name"></div>
       <div class="af-grp"><label>Phone Number *</label><input id="co-phone" type="tel" placeholder="0976 123 456" inputmode="tel"></div>
       <div class="af-grp" style="margin-bottom:12px">
@@ -1981,7 +1972,6 @@ function showCheckoutForm(){
       <button class="af-submit" onclick="submitOrder()">✅ Place Order via WhatsApp</button>
     </div>`;
   document.getElementById('modal-wrap').classList.add('open');
-  history.pushState({sec: currentSec, modal: true}, '', '#modal');
 }
 
 let _submittingOrder = false;
@@ -2102,7 +2092,7 @@ window.openModal = function(id){
       <span>${p.icon||'🛍️'}</span>`;
   }
   // You may also like
-  const related = PRODUCTS.filter(x=>x._id!==id && getCat(x)===cat && !x.hidden).slice(0,6);
+  const related = PRODUCTS.filter(x=>x._id!==id && getCat(x)===cat).slice(0,6);
   const youMayLike = related.length ? `
     <div class="you-like-wrap">
       <div class="you-like-ttl">You may also like</div>
@@ -2154,14 +2144,13 @@ window.openModal = function(id){
         ${outOfStock?'❌ Out of Stock':(inCart?'✓ Added to Cart':'🛒 Add to Cart')}
       </button>
       <button class="pm-wish-btn" onclick="toggleWish(null,'${id}')">${inWish?'❤️ Remove from Wishlist':'🤍 Add to Wishlist'}</button>
-      <button class="pm-wish-btn" style="margin-top:8px;border-color:rgba(22,163,74,.3);color:var(--green)" onclick="enquireProduct(null,'${p.name}','${displayPrice}','${id}','${p.bundlePrice||''}','${p.bundleQty||''}')">
+      <button class="pm-wish-btn" style="margin-top:8px;border-color:rgba(22,163,74,.3);color:var(--green)" onclick="enquireProduct(null,'${p.name}','${displayPrice}')">
         💬 Enquire on WhatsApp
       </button>
       <button class="pm-share-btn" onclick="shareProduct('${id}')">📤 Share this Product</button>
     </div>
     ${youMayLike}`;
   document.getElementById('modal-wrap').classList.add('open');
-  history.pushState({sec: currentSec, modal: true}, '', '#modal');
 };
 
 window.selSize = function(btn){
@@ -2228,17 +2217,11 @@ function renderWishlist(){
 }
 
 /* ════ ENQUIRE ════ */
-window.enquireProduct = function(e, name, price, productId, bundlePrice, bundleQty){
+window.enquireProduct = function(e, name, price){
   if(e) e.stopPropagation();
   const old = document.getElementById('branch-picker');
   if(old) old.remove();
-  // Check if user has the bundle option selected right now
-  const bundleActive = productId && document.getElementById('bopt-bundle')?.classList.contains('active');
-  const finalPrice = bundleActive && bundlePrice ? bundlePrice : price;
-  const itemDesc = bundleActive && bundleQty
-    ? `*${name}* — 🔥 Bundle Deal (${bundleQty} items for K${finalPrice})`
-    : `*${name}* (K${finalPrice})`;
-  const msgText = `Hi Shade's Apparel! 👋\n\nI'm interested in ${itemDesc}.\n\nPlease send me more details. Thank you!`;
+  const msgText = `Hi Shade's Apparel! 👋\n\nI'm interested in *${name}* (K${price}).\n\nPlease send me more details. Thank you!`;
   const sheet = document.createElement('div');
   sheet.id = 'branch-picker';
   sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(4px)';
@@ -2465,19 +2448,46 @@ function renderTrackResult(order){
 
 /* ════ ADMIN PIN ════ */
 let pinInput = '';
-const SECURITY_KEY = 'shades2026';
 
+/* SHA-256 helper */
+async function sha256(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* Fetch PIN hash from Firestore; auto-migrates plaintext PINs from older versions */
 async function getPIN(){
   try {
     const ref = doc(db,'shades_settings','admin');
     const snap = await getDoc(ref);
-    if(snap.exists()&&snap.data().pin) return snap.data().pin;
+    if(snap.exists() && snap.data().pin){
+      const stored = snap.data().pin;
+      // Legacy migration: if not a 64-char SHA-256 hex string, hash it and re-store
+      if(stored.length !== 64){
+        const hashed = await sha256(stored);
+        await setDoc(ref, {pin: hashed}, {merge:true});
+        return hashed;
+      }
+      return stored;
+    }
   } catch(e){}
-  return '123456';
+  // No settings doc yet — return hash of '123456' as default
+  return await sha256('123456');
+}
+
+/* Fetch security key hash from Firestore; defaults to hash of 'shades2026' for existing setups */
+async function getSecurityKey(){
+  try {
+    const ref = doc(db,'shades_settings','admin');
+    const snap = await getDoc(ref);
+    if(snap.exists() && snap.data().securityKey) return snap.data().securityKey;
+  } catch(e){}
+  return await sha256('shades2026');
 }
 
 async function setPIN(newPin){
-  try { await setDoc(doc(db,'shades_settings','admin'),{pin:newPin},{merge:true}); } catch(e){}
+  const hashed = await sha256(newPin);
+  try { await setDoc(doc(db,'shades_settings','admin'),{pin:hashed},{merge:true}); } catch(e){}
 }
 
 window.pinPress = function(key){
@@ -2498,7 +2508,8 @@ function updatePinDots(){
 
 async function checkPin(){
   const correct = await getPIN();
-  if(pinInput===correct){
+  const hashed  = await sha256(pinInput);
+  if(hashed===correct){
     document.getElementById('admin-lock').style.display='none';
     document.getElementById('adm-dash').style.display='block';
     startOrdersListener();
@@ -2524,9 +2535,9 @@ window.changePin = async function(){
   const conf   = document.getElementById('cp-confirm').value;
   const msg    = document.getElementById('cp-msg');
   msg.className='cp-msg';
-  const correct = await getPIN();
-  if(cur!==correct){ msg.className='cp-msg err'; msg.textContent='Current PIN is wrong'; return; }
-  if(seckey!==SECURITY_KEY){ msg.className='cp-msg err'; msg.textContent='Security key is wrong'; return; }
+  const [correct, correctSK] = await Promise.all([getPIN(), getSecurityKey()]);
+  if(await sha256(cur) !== correct){ msg.className='cp-msg err'; msg.textContent='Current PIN is wrong'; return; }
+  if(await sha256(seckey) !== correctSK){ msg.className='cp-msg err'; msg.textContent='Security key is wrong'; return; }
   if(nw.length!==6){ msg.className='cp-msg err'; msg.textContent='New PIN must be 6 digits'; return; }
   if(nw!==conf){ msg.className='cp-msg err'; msg.textContent='PINs do not match'; return; }
   await setPIN(nw);
@@ -2742,8 +2753,6 @@ window.openEditPanel = function(id){
   editImgUrls  = p.images?.length ? [...p.images] : (p.image ? [p.image] : []);
   editImgFiles = [];
   renderEditSlots();
-  if(p.image){ document.getElementById('ep-img-preview').src=p.image; document.getElementById('ep-img-preview').style.display='block'; document.getElementById('ep-img-label').style.display='none'; }
-  else { document.getElementById('ep-img-preview').style.display='none'; document.getElementById('ep-img-label').style.display='block'; }
   const panel = document.getElementById('edit-panel');
   panel.classList.add('show');
   panel.scrollIntoView({behavior:'smooth',block:'start'});
